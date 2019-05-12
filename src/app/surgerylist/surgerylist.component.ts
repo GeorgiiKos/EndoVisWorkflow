@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Surgery } from '../surgery';
+import { SurgeryPhases } from '../models/surgeryPhases';
+import { DataService } from '../services/data.service';
+import * as d3 from 'd3';
+
 @Component({
   selector: 'app-surgerylist',
   templateUrl: './surgerylist.component.html',
@@ -7,20 +10,22 @@ import { Surgery } from '../surgery';
 })
 export class SurgerylistComponent implements OnInit {
 
-  surgery: Surgery = {
-    id: 1,
-    name: 'Procto7'
-    
-  };
-  
-  constructor() { 
-  
-    
-  }
+  surgeryList: String[] = [];
+
+  surgeryPhases: SurgeryPhases[] = []
+
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
-    
+    this.loadSurgeryList();
   }
 
-  
+  public loadSurgeryList() {
+    this.dataService.getSurgeryList()
+      .subscribe(response => {
+        this.surgeryList = response;
+      })
+  }
+
+
 }

@@ -5,14 +5,13 @@ const csv = require('csv-parser')
 const SurgeryPhases = require('./SurgeryPhases')
 const bodyParser = require('body-parser');
 const path = require('path');
+const files = require('./files')
 
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
-phaseAnnotation = [
-  // File locations here
-];
+phaseAnnotation = files.phaseAnnotation;
 
 phasesArray = [];
 
@@ -34,7 +33,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
-app.get('/getPhasesArray', (req, res) => {
+app.get('/api/getPhasesArray', (req, res) => {
   for (let i in phasesArray) {
     if (phasesArray[i].name == req.body.name) {
       res.send(phasesArray[i]);
@@ -42,7 +41,7 @@ app.get('/getPhasesArray', (req, res) => {
   }
 });
 
-app.get('/getSurgeryList', (req, res) => {
+app.get('/api/getSurgeryList', (req, res) => {
   names = [];
   for (let i in phasesArray) {
     names.push(phasesArray[i].name)

@@ -8,7 +8,7 @@ export class DataService {
   constructor(private http: HttpClient) { }
 
   public getSurgeryList(): Observable<String[]> {
-    const url = 'http://localhost:8000/getSurgeryList'
+    const url = 'http://localhost:4200/api/getSurgeryList'
     return this.http.get<String[]>(url);
   }
 

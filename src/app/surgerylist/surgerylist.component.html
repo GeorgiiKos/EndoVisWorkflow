@@ -1,10 +1,16 @@
 <div *ngFor="let surgery of surgeryList">
-  <div class="card">
+  <div class="card my-2">
     <div class="card-body">
-      {{surgery}}
+      <h5 class="card-title">{{surgery.name}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted"><span class="badge badge-info">{{surgery.type}}</span></h6>
+      <div class="bg-light text-center" *ngIf="surgery.loading" style="height:40px; width: 100%;">
+        <div class="spinner-border text-primary" style="width: 40px; height: 40px" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <svg [ngClass]="surgery.loading ? 'd-none' : ''" attr.id="{{ surgery.name }}" width="100%" height="40px">
+
+      </svg>
     </div>
   </div>
 </div>
-<svg width="50" height="50">
-  <rect x="0" y="0" width="100" height="50" fill="green" />
-</svg>

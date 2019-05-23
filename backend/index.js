@@ -18,7 +18,7 @@ phasesArray = [];
 
 var testData = [];
 
-function readData() {
+function readPhaseAnnotation() {
   re = new RegExp('(Prokto|Sigma|Rektum){1}[6-8]*')
   for (let i = 0; i < phaseAnnotation.length; i++) {
     console.log("PARSING: ", phaseAnnotation[i])
@@ -40,7 +40,7 @@ function readData() {
   }
 }
 
-readData();
+readPhaseAnnotation();
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
@@ -68,6 +68,14 @@ app.get('/api/getSurgeryList', (req, res) => {
     surgeryList.push(new Surgery(phasesArray[i].name, type))
   }
   res.send(surgeryList);
+});
+
+app.get('/api/getImage', (req, res) => {
+  frameNr = Number(req.query.frame)
+  while(frameNr % files.images.jump != 0) {
+    frameNr--
+  }
+  res.sendFile(files.images.location + "/frame" + frameNr + ".jpg")
 });
 
 app.listen(8000, () => {

@@ -5,7 +5,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ## Running program
 1. Define file locations in `files.json`
 2. `npm start`
-3. `node backend/index.js`
+3. `cd backend`
+4. `npm start`
 
 ## Development server
 

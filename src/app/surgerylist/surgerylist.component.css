@@ -1,0 +1,26 @@
+.card-clicked {
+    height: 500px;
+    transition: height 1s;
+    transition-timing-function: ease-in-out;
+}
+
+::ng-deep div.ttip {
+    position: absolute;
+    text-align: center;
+    width: 60px;
+    padding: 5px;
+    font-size: 12px;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+::ng-deep .tip {
+    position: absolute;
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 10px solid lightsteelblue;
+}

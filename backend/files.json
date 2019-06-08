@@ -1,5 +1,39 @@
 {
     "phaseAnnotation": [
-        
-    ]
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Prokto6.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Prokto7.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Prokto8.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Sigma6.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Sigma7.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Sigma8.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Rektum6.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Rektum7.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/PhaseAnnotation/Rektum8.csv"
+    ],
+    "deviceData": [
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Prokto6_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Prokto7_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Prokto8_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Sigma6_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Sigma7_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Sigma8_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Rektum6_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Rektum7_Device.csv",
+        "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos/DeviceData/Rektum8_Device.csv"
+    ],
+    "mediaContent": {
+        "videoData": [
+            "C:/Users/Georgii/Downloads/Prokto6.avi",
+            "C:/Users/Georgii/Downloads/Prokto7.avi",
+            "C:/Users/Georgii/Downloads/Prokto8.avi",
+            "C:/Users/Georgii/Downloads/Sigma6.avi",
+            "C:/Users/Georgii/Downloads/Sigma7.avi",
+            "C:/Users/Georgii/Downloads/Sigma8.avi",
+            "C:/Users/Georgii/Downloads/Rektum6.avi",
+            "C:/Users/Georgii/Downloads/Rektum7.avi",
+            "C:/Users/Georgii/Downloads/Rektum8.avi"
+        ],
+        "output": "C:/Users/Georgii/Desktop/frames",
+        "rate": 1500
+    }
 }

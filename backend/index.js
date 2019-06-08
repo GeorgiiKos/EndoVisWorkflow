@@ -4,6 +4,7 @@ const fs = require('fs')
 const csv = require('csv-parser')
 const SurgeryPhases = require('./SurgeryPhases')
 const Surgery = require('./Surgery')
+const DeviceData = require('./DeviceData')
 const bodyParser = require('body-parser');
 const path = require('path');
 const files = require('./files')
@@ -13,13 +14,14 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
 phaseAnnotation = files.phaseAnnotation;
+deviceData = files.deviceData;
 
 phasesArray = [];
+deviceArray = [];
+re = new RegExp('(Prokto|Sigma|Rektum){1}[6-8]{1}')
 
-var testData = [];
 
 function readPhaseAnnotation() {
-  re = new RegExp('(Prokto|Sigma|Rektum){1}[6-8]*')
   for (let i = 0; i < phaseAnnotation.length; i++) {
     console.log("PARSING: ", phaseAnnotation[i])
 
@@ -31,16 +33,26 @@ function readPhaseAnnotation() {
       .map(e => e.split(',').map(e => e.trim()));
 
     phasesArray.push(new SurgeryPhases(phaseAnnotation[i].match(re)[0], data))
+  }
+}
 
+function readDeviceData() {
+  for (let i = 0; i < deviceData.length; i++) {
+    console.log("PARSING: ", deviceData[i])
 
-    /*
-    fs.createReadStream(phaseAnnotation[i])
-      .pipe(csv(['frame', 'phase'])).on('data', (data) => input.push(data))
-      .on('end', () => phasesArray.push(new SurgeryPhases(phaseAnnotation[i].match(re)[0], input)));*/
+    var data = fs.readFileSync(deviceData[i])
+      .toString() // convert Buffer to string
+      .trim()
+      .split('\n') // split string to lines
+      .map(e => e.trim()) // remove white spaces for each line
+      .map(e => e.split(',').map(e => e.trim()));
+
+    deviceArray.push(new DeviceData(deviceData[i].match(re)[0], data))
   }
 }
 
 readPhaseAnnotation();
+readDeviceData();
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
@@ -50,6 +62,14 @@ app.get('/api/getPhasesArray', (req, res) => {
   for (let i in phasesArray) {
     if (phasesArray[i].name == req.query.surgeryName) {
       res.send(phasesArray[i]);
+    }
+  }
+});
+
+app.get('/api/getDeviceArray', (req, res) => {
+  for (let i in deviceData) {
+    if (deviceArray[i].name == req.query.surgeryName) {
+      res.send(deviceArray[i]);
     }
   }
 });
@@ -72,10 +92,11 @@ app.get('/api/getSurgeryList', (req, res) => {
 
 app.get('/api/getImage', (req, res) => {
   frameNr = Number(req.query.frame)
-  while(frameNr % files.images.jump != 0) {
+  surgery = req.query.surgeryName
+  while (frameNr % files.mediaContent.rate != 0) {
     frameNr--
   }
-  res.sendFile(files.images.location + "/frame" + frameNr + ".jpg")
+  res.sendFile(files.mediaContent.output + "/" + surgery + "/frame" + frameNr + ".jpg")
 });
 
 app.listen(8000, () => {

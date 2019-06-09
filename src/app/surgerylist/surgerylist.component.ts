@@ -180,14 +180,13 @@ export class SurgerylistComponent implements OnInit {
     var drag = (d) => {
       var svgWidth = parseFloat(svg.style("width"));
       var lineX = parseFloat(line.attr("x1"))
+      var newX = parseFloat(d3.event.x);
 
-      line.attr("x1", lineX < 0 ? 0 : lineX > svgWidth ? svgWidth : d3.event.x).attr("x2", lineX < 0 ? 0 : lineX > svgWidth ? svgWidth : d3.event.x);
-      image.attr("x", lineX < 0 ? 0 : lineX > svgWidth ? svgWidth : d3.event.x);
+      line.attr("x1", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX).attr("x2", lineX < 0 ? 0 : newX > svgWidth ? svgWidth : newX);
+      image.attr("x", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX);
 
-      var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(parseFloat(d3.event.x) / parseFloat(svg.style("width")) * 100));
-      console.log("CALCULATED PERCENT: " + parseFloat(d3.event.x) / parseFloat(svg.style("width")) * 100)
-      console.log("FRAME: " + frameNr)
-
+      var updatedX = parseFloat(line.attr("x1"))
+      var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(updatedX / parseFloat(svg.style("width")) * 100));
       updateImage(frameNr);
     }
 
@@ -201,8 +200,6 @@ export class SurgerylistComponent implements OnInit {
     });
 
     line.call(d3.drag().on("drag", drag))
-    //line.call(d3.drag().on("start", {}))
-    //line.call(d3.drag().on("end", {}))
     image.call(d3.drag().on("drag", drag))
   }
 

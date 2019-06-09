@@ -7,7 +7,6 @@ import { SurgeryScale } from '../models/surgeryScale';
 import { DataService } from '../services/data.service';
 import { Scale } from '../models/scale';
 import { DeviceData } from '../models/DeviceData';
-import { ViewEncapsulation } from '@angular/compiler/src/core';
 
 @Component({
   selector: 'app-surgerylist',
@@ -100,10 +99,28 @@ export class SurgerylistComponent implements OnInit {
       .attr("class", "tip")
       .style("opacity", 0);
 
+    // Define container for image tooltip
+    var imgTip = d3.select("#card-" + surgeryName).append("div")
+      .attr("class", "imgTip")
+      .style("left", "10px")
+      .style("top", "148.6px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 20
+    var imgFrame = d3.select("#card-" + surgeryName).append("div")
+      .attr("class", "imgFrame")
+      .style("top", "76.6px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 72 - 20
+      .style("left", "10px")
+    var img = imgFrame.append("img")
+      .attr("class", "img")
+      .attr("src", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=0")
+      .style("width", "96px")
+      .style("height", "54px")
+    var details = imgFrame.append("div")
+    var frameField = details.append("div").html("Frame: 0").style("display", "inline-block");
+    //var phaseField = details.append("div").html("Phase: 0").style("display", "inline-block").style("padding-left", "20px");
+
     var svg = d3.select('#' + surgeryName)  // find the right svg
     var prevPos = 0
     this.surgeryScale.find(d => d.name == surgeryName).percentage.map(d => {
-      svg.append('rect').attr("x", prevPos + "%").attr("y", 20).attr("width", d.percent + "%").attr("height", 40)
+      svg.append('rect').attr("x", prevPos + "%").attr("y", 90).attr("width", d.percent + "%").attr("height", 40)
         .on("mouseover", function () {
           var thisRect = d3.select(this);
           var rectCoords = this.getBBox();
@@ -115,13 +132,13 @@ export class SurgerylistComponent implements OnInit {
             .duration(300)
             .style("opacity", 1);
           tip.transition()
-          .duration(300)
-          .style("opacity", .9);
+            .duration(300)
+            .style("opacity", .9);
           div.html("Phase: " + d.phaseNr)
             .style("left", (rectCoords.x + (rectCoords.width / 2) - 10) + "px") // minus padding
-            .style("top", "61px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 20 - 10 - 27.6
+            .style("top", "131px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 10 - 27.6
           tip.style("left", (rectCoords.x + (rectCoords.width / 2) - 10 + 25) + "px")
-            .style("top", "88.6px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 20 - 10
+            .style("top", "158.6px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 10
         })
         .on("mouseout", function () {
           var thisRect = d3.select(this);
@@ -169,38 +186,55 @@ export class SurgerylistComponent implements OnInit {
       this.surgeryList.find(d => d.name == surgeryName).loading = false;
     })
 
-    var line = svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 500).attr("stroke-width", 4).attr("stroke", "gray");
-    var image = svg.append("image").attr("xlink:href", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=0").attr("x", 0).attr("y", 0);
-    //var imageFrame = image.append("rect").attr("y", 0).attr("x", 0).attr("fill", "gray").attr("width", "100px").attr("height", "100px");
+    var line = svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 500).attr("stroke-width", "1px").attr("stroke", "dimgray");
 
     var updateImage = (frameNr) => {
-      image.attr("xlink:href", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=" + frameNr)
+      img.attr("src", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=" + frameNr)
     }
 
-    var drag = (d) => {
+    var drag = () => {
       var svgWidth = parseFloat(svg.style("width"));
       var lineX = parseFloat(line.attr("x1"))
       var newX = parseFloat(d3.event.x);
 
-      line.attr("x1", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX).attr("x2", lineX < 0 ? 0 : newX > svgWidth ? svgWidth : newX);
-      image.attr("x", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX);
+      line.attr("x1", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX).attr("x2", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX);
 
       var updatedX = parseFloat(line.attr("x1"))
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(updatedX / parseFloat(svg.style("width")) * 100));
+      console.log("NEW FRAME " + frameNr)
+
+      imgTip.style("left", (updatedX + 10) + "px")
+
+      if ((updatedX + 102 - 20) <= svgWidth) {
+        imgFrame.style("left", (updatedX + 10) + "px")
+      } else {
+        imgFrame.style("left", (svgWidth - 102 + 30) + "px")
+      }
+
+      frameField.html("Frame: " + frameNr);
       updateImage(frameNr);
     }
 
     svg.on("click", () => {
-      var coords = d3.mouse(svg.node());
-      line.raise().attr("x1", coords[0]).attr("x2", coords[0]);
-      image.attr("x", coords[0])
+      var svgWidth = parseFloat(svg.style("width"));
+      var newX = d3.mouse(svg.node())[0];
+      console.log(newX)
+      line.raise().attr("x1", newX).attr("x2", newX);
+      imgTip.style("left", (newX + 10) + "px")
 
-      var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(parseFloat(coords[0]) / parseFloat(svg.style("width")) * 100));
+      if ((newX + 102 - 20) <= svgWidth) {
+        imgFrame.style("left", (newX + 10) + "px")
+      } else {
+        imgFrame.style("left", (svgWidth - 102 + 30) + "px")
+      }
+
+      var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(parseFloat(newX) / parseFloat(svg.style("width")) * 100));
       updateImage(frameNr);
     });
 
     line.call(d3.drag().on("drag", drag))
-    image.call(d3.drag().on("drag", drag))
+    imgTip.call(d3.drag().on("drag", drag))
+    imgFrame.call(d3.drag().on("drag", drag))
   }
 
   public drawLineGraph(surgeryName: String) {

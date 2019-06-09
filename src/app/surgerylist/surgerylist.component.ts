@@ -71,6 +71,7 @@ export class SurgerylistComponent implements OnInit {
 
     var sum = 0
     result.map(d => sum += d[1])
+    console.log("SUM: " + sum)
     var scaleFunc = d3.scaleLinear().domain([0, sum]).range([0, 100]);
 
     this.scaleFunctions.push(new Scale(surgeryName, scaleFunc));
@@ -112,24 +113,24 @@ export class SurgerylistComponent implements OnInit {
             .style("opacity", .7);
           div.transition()
             .duration(300)
-            .style("opacity", .9);
+            .style("opacity", 1);
           tip.transition()
           .duration(300)
           .style("opacity", .9);
           div.html("Phase: " + d.phaseNr)
-            .style("left", (rectCoords.x + (rectCoords.width / 2) - 10) + "px")
-            .style("top", "62.6px");
+            .style("left", (rectCoords.x + (rectCoords.width / 2) - 10) + "px") // minus padding
+            .style("top", "61px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 20 - 10 - 27.6
           tip.style("left", (rectCoords.x + (rectCoords.width / 2) - 10 + 25) + "px")
-            .style("top", "89.6px");
+            .style("top", "88.6px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 20 - 10
         })
         .on("mouseout", function () {
           var thisRect = d3.select(this);
           div.transition()
             .duration(300)
-            .style("opacity", 1);
+            .style("opacity", 0);
           tip.transition()
             .duration(300)
-            .style("opacity", 1);
+            .style("opacity", 0);
           thisRect.transition()
             .duration(300)
             .style("opacity", 1);
@@ -137,38 +138,38 @@ export class SurgerylistComponent implements OnInit {
         .attr("fill", () => {
           switch (Number(d.phaseNr)) {
             case 0:
-              return "red"
+              return "#fe2712"
             case 1:
-              return "green"
+              return "#fe2712"
             case 2:
-              return "blue"
+              return "#a7194b"
             case 3:
-              return "Olive"
+              return "#8601af"
             case 4:
-              return "yellow"
+              return "#3d01a4"
             case 5:
-              return "grey"
+              return "#0247fe"
             case 6:
-              return "black"
+              return "#0392ce"
             case 7:
-              return "orange"
+              return "#66b032"
             case 8:
-              return "purple"
+              return "#d0ea2b"
             case 9:
-              return "brown"
+              return "#fefe33"
             case 10:
-              return "cyan"
+              return "#fabc02"
             case 11:
-              return "white"
+              return "#fb9902"
             case 12:
-              return "fuchsia"
+              return "#8e8e8e"
           }
         })
       prevPos = prevPos + d.percent.valueOf();
       this.surgeryList.find(d => d.name == surgeryName).loading = false;
     })
 
-    var line = svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 80).attr("stroke-width", 4).attr("stroke", "gray");
+    var line = svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 500).attr("stroke-width", 4).attr("stroke", "gray");
     var image = svg.append("image").attr("xlink:href", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=0").attr("x", 0).attr("y", 0);
     //var imageFrame = image.append("rect").attr("y", 0).attr("x", 0).attr("fill", "gray").attr("width", "100px").attr("height", "100px");
 
@@ -180,12 +181,13 @@ export class SurgerylistComponent implements OnInit {
       var svgWidth = parseFloat(svg.style("width"));
       var lineX = parseFloat(line.attr("x1"))
 
-      console.log(lineX)
-
       line.attr("x1", lineX < 0 ? 0 : lineX > svgWidth ? svgWidth : d3.event.x).attr("x2", lineX < 0 ? 0 : lineX > svgWidth ? svgWidth : d3.event.x);
       image.attr("x", lineX < 0 ? 0 : lineX > svgWidth ? svgWidth : d3.event.x);
 
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(parseFloat(d3.event.x) / parseFloat(svg.style("width")) * 100));
+      console.log("CALCULATED PERCENT: " + parseFloat(d3.event.x) / parseFloat(svg.style("width")) * 100)
+      console.log("FRAME: " + frameNr)
+
       updateImage(frameNr);
     }
 

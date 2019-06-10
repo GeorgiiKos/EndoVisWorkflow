@@ -99,6 +99,10 @@ app.get('/api/getImage', (req, res) => {
   res.sendFile(files.mediaContent.output + "/" + surgery + "/frame" + frameNr + ".jpg")
 });
 
+app.get('/api/getDevice', (req, res) => {
+  res.sendFile(files.deviceData[1])
+});
+
 app.listen(8000, () => {
   console.log('Server runnung on port 8000!')
 });

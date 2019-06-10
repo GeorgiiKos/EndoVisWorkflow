@@ -7,6 +7,8 @@ import { SurgeryScale } from '../models/surgeryScale';
 import { DataService } from '../services/data.service';
 import { Scale } from '../models/scale';
 import { DeviceData } from '../models/DeviceData';
+import { DeviceDataUnit } from '../models/deviceDataUnit';
+import { isObject } from 'util';
 
 @Component({
   selector: 'app-surgerylist',
@@ -40,11 +42,20 @@ export class SurgerylistComponent implements OnInit {
       })
   }
 
-  public loadSurgeryPhases(surgerName: String) {
-    this.dataService.getPhasesArray(surgerName)
+  public loadSurgeryPhases(surgeryName: String) {
+    this.dataService.getPhasesArray(surgeryName)
       .subscribe(response => {
         this.surgeryPhases.push(response); // TODO: check doubles
-        this.calcPhasePercentage(surgerName);
+        this.calcPhasePercentage(surgeryName);
+        this.loadDeviceData(surgeryName)
+      })
+  }
+
+  public loadDeviceData(surgeryName: String) {
+    this.dataService.getDeviceArray(surgeryName)
+      .subscribe(response => {
+        this.deviceData.push(response);
+        this.calcDevicePercentage(surgeryName);
       })
   }
 
@@ -66,11 +77,11 @@ export class SurgerylistComponent implements OnInit {
       }
     }
 
-    console.log("THE RESULT FOR", surgeryName, result)
+    //console.log("THE RESULT FOR", surgeryName, result)
 
     var sum = 0
     result.map(d => sum += d[1])
-    console.log("SUM: " + sum)
+    //console.log("SUM: " + sum)
     var scaleFunc = d3.scaleLinear().domain([0, sum]).range([0, 100]);
 
     this.scaleFunctions.push(new Scale(surgeryName, scaleFunc));
@@ -85,10 +96,94 @@ export class SurgerylistComponent implements OnInit {
 
   public calcDevicePercentage(surgeryName: String) {
     var index = this.deviceData.findIndex(d => d.name == surgeryName);
+    var length = this.deviceData[index].data.length;
+    var svgWidth = parseFloat(d3.select('#' + surgeryName).style("width"));
 
-    var scaleFuncX = d3.scaleLinear().domain([0,]).range([0, 100]);
-    var scaleFuncY = d3.scaleLinear().domain([0,]).range([0, 100]);
+    this.deviceData[index].data = this.createBinsMiddle(this.deviceData[index].data)
+    //console.log(this.deviceData[index].data)
+
+    var min = d3.min(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
+    var max = d3.max(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
+
+    var scaleFuncX = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY = d3.scaleLinear().domain([min, max]).range([200, 0]);
+
+    var valueline = d3.line()
+      .x(function (d, i) { return scaleFuncX(d.frame); })
+      .y(function (d) { return scaleFuncY(d.thermoCurrGasFlow); })
+    //.curve(d3.curveMonotoneX) // apply smoothing to the line
+
+    var svg = d3.select('#' + surgeryName);
+
+    svg.append("path")
+      .datum(this.deviceData[index].data)
+      .attr("d", valueline)
+      .attr("transform", "translate(0," + 250 + ")")
+      .attr("fill", "none")
+      .attr("stroke", "#ffab00")
+      .attr("stroke-width", "1")
+
+    // Call the x axis in a group tag
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + 450 + ")")
+      .call(d3.axisBottom(scaleFuncX)); // Create an axis component with d3.axisBottom
   }
+
+  public createBinsMiddle(arr: DeviceDataUnit[]) {
+    var nrBins = 500;
+    var sum = 0;
+    var firstPosition = 0;
+    var newArr: DeviceDataUnit[] = []
+    for (var i in arr) {
+      sum += Number(arr[i].thermoCurrGasFlow);
+      if (Number(i) - nrBins + 1 == firstPosition && Number(i) != 0) {
+        var newUnit = arr[i];
+        newUnit.thermoCurrGasFlow = sum / nrBins;
+        newUnit.frame = firstPosition;
+        newArr.push(newUnit);
+        sum = 0;
+        firstPosition = Number(i) + 1;
+        if ((Number(i) + nrBins + 1 + 1) > arr.length) {
+          nrBins = (Number(i) + nrBins + 1) - arr.length;
+        }
+      }
+    }
+    return newArr;
+  }
+
+  public createBinsMedian(arr: DeviceDataUnit[]) {
+    var nrBins = 500;
+    var bin = [];
+    var firstPosition = 0;
+    var newArr: DeviceDataUnit[] = [];
+    for (var i in arr) {
+      bin.push(Number(arr[i].thermoCurrGasFlow));
+      if (Number(i) - nrBins + 1 == firstPosition && Number(i) != 0) {
+        bin.sort(function (a, b) {
+          return a - b;
+        });
+        var half = Math.floor(bin.length / 2);
+        var newVal = 0;
+        if (bin.length % 2)
+          newVal = bin[half];
+        else
+          newVal = (bin[half - 1] + bin[half]) / 2.0;
+        var newUnit = arr[i];
+        newUnit.thermoCurrGasFlow = newVal;
+        newUnit.frame = firstPosition;
+        newArr.push(newUnit)
+        bin = [];
+        firstPosition = Number(i) + 1;
+        if ((Number(i) + nrBins + 1 + 1) > arr.length) {
+          nrBins = (Number(i) + nrBins + 1) - arr.length;
+        }
+      }
+    }
+    return newArr;
+  }
+
+  public
 
   public drawBars(surgeryName: String) {
     // Define the div for the tooltip
@@ -106,7 +201,7 @@ export class SurgerylistComponent implements OnInit {
       .style("top", "148.6px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 20
     var imgFrame = d3.select("#card-" + surgeryName).append("div")
       .attr("class", "imgFrame")
-      .style("top", "76.6px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 72 - 20
+      .style("top", "76.96px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 71.64 - 20
       .style("left", "10px")
     var img = imgFrame.append("img")
       .attr("class", "img")
@@ -201,7 +296,7 @@ export class SurgerylistComponent implements OnInit {
 
       var updatedX = parseFloat(line.attr("x1"))
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(updatedX / parseFloat(svg.style("width")) * 100));
-      console.log("NEW FRAME " + frameNr)
+      //console.log("NEW FRAME " + frameNr)
 
       imgTip.style("left", (updatedX + 10) + "px")
 
@@ -218,7 +313,7 @@ export class SurgerylistComponent implements OnInit {
     svg.on("click", () => {
       var svgWidth = parseFloat(svg.style("width"));
       var newX = d3.mouse(svg.node())[0];
-      console.log(newX)
+      //console.log(newX)
       line.raise().attr("x1", newX).attr("x2", newX);
       imgTip.style("left", (newX + 10) + "px")
 
@@ -229,6 +324,7 @@ export class SurgerylistComponent implements OnInit {
       }
 
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(parseFloat(newX) / parseFloat(svg.style("width")) * 100));
+      frameField.html("Frame: " + frameNr);
       updateImage(frameNr);
     });
 

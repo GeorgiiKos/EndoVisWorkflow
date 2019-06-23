@@ -3,7 +3,7 @@ const app = express();
 const fs = require('fs')
 const csv = require('csv-parser')
 const SurgeryPhases = require('./SurgeryPhases')
-const Surgery = require('./Surgery')
+const SurgeryMetadata = require('./SurgeryMetadata')
 const DeviceData = require('./DeviceData')
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -16,10 +16,20 @@ app.use(express.static(path.join(__dirname, '../dist')));
 phaseAnnotation = files.phaseAnnotation;
 deviceData = files.deviceData;
 
+metadata = [];
+
 phasesArray = [];
 deviceArray = [];
 re = new RegExp('(Prokto|Sigma|Rektum){1}[6-8]{1}')
 
+function readVideoData() {
+  var data = fs.readFileSync(files.mediaContent.output + "/video_properties.csv")
+  .toString() // convert Buffer to string
+  .trim()
+  .split('\n') // split string to lines
+  .map(e => e.trim()) // remove white spaces for each line
+  .map(e => e.split(',').map(e => e.trim()))
+  .map(e => metadata.push(new SurgeryMetadata(e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8])));}
 
 function readPhaseAnnotation() {
   for (let i = 0; i < phaseAnnotation.length; i++) {
@@ -51,6 +61,7 @@ function readDeviceData() {
   }
 }
 
+readVideoData();
 readPhaseAnnotation();
 readDeviceData();
 
@@ -75,19 +86,7 @@ app.get('/api/getDeviceArray', (req, res) => {
 });
 
 app.get('/api/getSurgeryList', (req, res) => {
-  surgeryList = [];
-  for (let i in phasesArray) {
-    var type = null;
-    if (phasesArray[i].name.includes('Prokto')) {
-      type = 'Proctocolectomy'
-    } else if (phasesArray[i].name.includes('Sigma')) {
-      type = 'Sigmoid resection'
-    } else if (phasesArray[i].name.includes('Rektum')) {
-      type = 'Rectal resection'
-    }
-    surgeryList.push(new Surgery(phasesArray[i].name, type))
-  }
-  res.send(surgeryList);
+  res.send(metadata);
 });
 
 app.get('/api/getImage', (req, res) => {

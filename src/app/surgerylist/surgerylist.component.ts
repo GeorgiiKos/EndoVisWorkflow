@@ -25,6 +25,10 @@ export class SurgerylistComponent implements OnInit {
 
   deviceData: DeviceData[] = []
 
+  // Positioning variables
+  svgMargin = 30;
+  cardBorder = 0.5;
+
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
@@ -47,6 +51,7 @@ export class SurgerylistComponent implements OnInit {
       .subscribe(response => {
         this.surgeryPhases.push(response); // TODO: check doubles
         this.calcPhasePercentage(surgeryName);
+        this.fillPhasePercentageTable(surgeryName)
         this.loadDeviceData(surgeryName)
       })
   }
@@ -106,32 +111,51 @@ export class SurgerylistComponent implements OnInit {
     var max = d3.max(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
 
     var scaleFuncX = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY = d3.scaleLinear().domain([min, max]).range([200, 0]);
+    //var scaleFuncX2 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY = d3.scaleLinear().domain([0, 200]).range([200, 0]);
 
     var valueline = d3.line()
       .x(function (d, i) { return scaleFuncX(d.frame); })
       .y(function (d) { return scaleFuncY(d.thermoCurrGasFlow); })
     //.curve(d3.curveMonotoneX) // apply smoothing to the line
 
-    var svg = d3.select('#' + surgeryName);
+    var valueline2 = d3.line()
+      .x(function (d, i) { return scaleFuncX(d.frame); })
+      .y(function (d) { return scaleFuncY(d.thermoCurrGasPress); })
+
+    var svg = d3.select('#graph1-' + surgeryName)
+      .attr("transform", "translate(0, 10)");
 
     svg.append("path")
       .datum(this.deviceData[index].data)
       .attr("d", valueline)
-      .attr("transform", "translate(0," + 250 + ")")
+      .attr("transform", "translate(" + this.svgMargin + ", 0)")
       .attr("fill", "none")
       .attr("stroke", "#ffab00")
+      .attr("stroke-width", "1")
+
+    svg.append("path")
+      .datum(this.deviceData[index].data)
+      .attr("d", valueline2)
+      .attr("transform", "translate(" + this.svgMargin + ", 0)")
+      .attr("fill", "none")
+      .attr("stroke", "#ff00ff")
       .attr("stroke-width", "1")
 
     // Call the x axis in a group tag
     svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + 450 + ")")
+      .attr("transform", "translate(" + this.svgMargin + ", 200)")
       .call(d3.axisBottom(scaleFuncX)); // Create an axis component with d3.axisBottom
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY)); // Create an axis component with d3.axisLeft
   }
 
   public createBinsMiddle(arr: DeviceDataUnit[]) {
-    var nrBins = 500;
+    var nrBins = 150;
     var sum = 0;
     var firstPosition = 0;
     var newArr: DeviceDataUnit[] = []
@@ -153,7 +177,7 @@ export class SurgerylistComponent implements OnInit {
   }
 
   public createBinsMedian(arr: DeviceDataUnit[]) {
-    var nrBins = 500;
+    var nrBins = 150;
     var bin = [];
     var firstPosition = 0;
     var newArr: DeviceDataUnit[] = [];
@@ -197,12 +221,12 @@ export class SurgerylistComponent implements OnInit {
     // Define container for image tooltip
     var imgTip = d3.select("#card-" + surgeryName).append("div")
       .attr("class", "imgTip")
-      .style("left", "10px")
-      .style("top", "148.6px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 20
+      .style("left", (this.svgMargin + this.cardBorder - 10) + "px")
+      .style("top", "158.6px") // 30 + 24 + 12 - 6 + 20.6 + 8 + 30 + 60 - 20
     var imgFrame = d3.select("#card-" + surgeryName).append("div")
       .attr("class", "imgFrame")
-      .style("top", "76.96px") // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 71.64 - 20
-      .style("left", "10px")
+      .style("top", "86.96px") // 30 + 24 + 12 - 6 + 20.6 + 8 + 30 + 60 - 71.64 - 20
+      .style("left", (this.svgMargin + this.cardBorder - 10) + "px")
     var img = imgFrame.append("img")
       .attr("class", "img")
       .attr("src", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=0")
@@ -215,7 +239,7 @@ export class SurgerylistComponent implements OnInit {
     var svg = d3.select('#' + surgeryName)  // find the right svg
     var prevPos = 0
     this.surgeryScale.find(d => d.name == surgeryName).percentage.map(d => {
-      svg.append('rect').attr("x", prevPos + "%").attr("y", 90).attr("width", d.percent + "%").attr("height", 40)
+      svg.append('rect').attr("x", prevPos + "%").attr("y", 60).attr("width", d.percent + "%").attr("height", 40)
         .on("mouseover", function () {
           var thisRect = d3.select(this);
           var rectCoords = this.getBBox();
@@ -230,10 +254,10 @@ export class SurgerylistComponent implements OnInit {
             .duration(300)
             .style("opacity", .9);
           div.html("Phase: " + d.phaseNr)
-            .style("left", (rectCoords.x + (rectCoords.width / 2) - 10) + "px") // minus padding
-            .style("top", "131px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 10 - 27.6
-          tip.style("left", (rectCoords.x + (rectCoords.width / 2) - 10 + 25) + "px")
-            .style("top", "158.6px"); // 20 + 24 + 12 - 6 + 20.6 + 8 + 90 - 10
+            .style("left", (rectCoords.x + (rectCoords.width / 2)) + "px") // minus padding
+            .style("top", "141px"); // 30 + 24 + 12 - 6 + 20.6 + 8 + 30 + 60 - 10 - 27.6
+          tip.style("left", (rectCoords.x + (rectCoords.width / 2) + 25) + "px")
+            .style("top", "168.6px"); // 30 + 24 + 12 - 6 + 20.6 + 8 + 30 + 60 - 10
         })
         .on("mouseout", function () {
           var thisRect = d3.select(this);
@@ -282,6 +306,10 @@ export class SurgerylistComponent implements OnInit {
     })
 
     var line = svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 500).attr("stroke-width", "1px").attr("stroke", "dimgray");
+    // temporary solution
+    var svg2 = d3.select('#graph1-' + surgeryName)
+    var line2 = svg2.append("line").attr("x1", this.svgMargin + 1).attr("y1", -10).attr("x2", this.svgMargin + 1).attr("y2", 240).attr("stroke-width", "1px").attr("stroke", "dimgray");
+
 
     var updateImage = (frameNr) => {
       img.attr("src", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=" + frameNr)
@@ -293,17 +321,18 @@ export class SurgerylistComponent implements OnInit {
       var newX = parseFloat(d3.event.x);
 
       line.attr("x1", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX).attr("x2", newX < 0 ? 0 : newX > svgWidth ? svgWidth : newX);
+      line2.attr("x1", Number(line.attr("x1")) + this.svgMargin + 0.5).attr("x2", Number(line.attr("x1")) + this.svgMargin + 0.5);
 
       var updatedX = parseFloat(line.attr("x1"))
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(updatedX / parseFloat(svg.style("width")) * 100));
       //console.log("NEW FRAME " + frameNr)
 
-      imgTip.style("left", (updatedX + 10) + "px")
+      imgTip.style("left", (updatedX + this.svgMargin - 10) + "px")
 
-      if ((updatedX + 102 - 20) <= svgWidth) {
-        imgFrame.style("left", (updatedX + 10) + "px")
+      if ((updatedX + 102 - 10) <= svgWidth) {
+        imgFrame.style("left", (updatedX + this.svgMargin - 10) + "px")
       } else {
-        imgFrame.style("left", (svgWidth - 102 + 30) + "px")
+        imgFrame.style("left", (svgWidth - 102 + this.svgMargin + 10) + "px")
       }
 
       frameField.html("Frame: " + frameNr);
@@ -315,12 +344,12 @@ export class SurgerylistComponent implements OnInit {
       var newX = d3.mouse(svg.node())[0];
       //console.log(newX)
       line.raise().attr("x1", newX).attr("x2", newX);
-      imgTip.style("left", (newX + 10) + "px")
+      imgTip.style("left", (newX + this.svgMargin - 10) + "px")
 
-      if ((newX + 102 - 20) <= svgWidth) {
-        imgFrame.style("left", (newX + 10) + "px")
+      if ((newX + 102 - 10) <= svgWidth) {
+        imgFrame.style("left", (newX + this.svgMargin - 10) + "px")
       } else {
-        imgFrame.style("left", (svgWidth - 102 + 30) + "px")
+        imgFrame.style("left", (svgWidth - 102 + this.svgMargin + 10) + "px")
       }
 
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert(parseFloat(newX) / parseFloat(svg.style("width")) * 100));
@@ -333,9 +362,19 @@ export class SurgerylistComponent implements OnInit {
     imgFrame.call(d3.drag().on("drag", drag))
   }
 
-  public drawLineGraph(surgeryName: String) {
+  /*public drawLineGraph(surgeryName: String) {
     var svg = d3.select('#' + surgeryName)
     svg.append("")
+  }*/
+
+  public fillPhasePercentageTable(surgeryName: String) {
+    var table = d3.select('#' + surgeryName + "-phasePercentage").select("tbody");
+    var surgeryPhases = this.surgeryPhases.find(d => d.name == surgeryName);
+    var roll = d3.nest().key(d => d[0]).rollup(d => d[1]).entries(surgeryPhases.phases)
+    console.log(roll)
+
+    //var row = table.append('tr').append('td').text("abc")
+
   }
 
   /*public expandCard(id: String) {

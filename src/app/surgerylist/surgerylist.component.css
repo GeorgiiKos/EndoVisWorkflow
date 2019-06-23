@@ -34,11 +34,13 @@
 	border-top: 20px solid dimgray;
 }
 
-
-
 ::ng-deep .imgFrame {
     position: absolute;
     padding: 3px;
     background-color: dimgray;
     font-size: 8px
+}
+
+.card{
+    box-shadow: 1px 1px 1px 1px #ccc;
 }

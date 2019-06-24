@@ -48,7 +48,7 @@ for i in videoArr['mediaContent']['videoData']:
     dur = float(numFrames) / float(fps)
     h = int(dur / 3600)
     m = int((dur / 60) % 60)
-    s = int(dur/ 3600)
+    s = int(dur % 60)
     print('Video duration: %dh %dm %ds' % (h, m, s))
     
     

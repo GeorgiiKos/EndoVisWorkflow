@@ -62,27 +62,19 @@ function readDeviceData() {
 }
 
 readVideoData();
-readPhaseAnnotation();
-readDeviceData();
+//readPhaseAnnotation();
+//readDeviceData();
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 app.get('/api/getPhasesArray', (req, res) => {
-  for (let i in phasesArray) {
-    if (phasesArray[i].name == req.query.surgeryName) {
-      res.send(phasesArray[i]);
-    }
-  }
+  res.sendFile(files.csvLocation + "/PhaseAnnotation/" + req.query.surgeryName + ".csv");
 });
 
 app.get('/api/getDeviceArray', (req, res) => {
-  for (let i in deviceData) {
-    if (deviceArray[i].name == req.query.surgeryName) {
-      res.send(deviceArray[i]);
-    }
-  }
+  res.sendFile(files.csvLocation + "/DeviceData/" + req.query.surgeryName + "_Device.csv");
 });
 
 app.get('/api/getSurgeryList', (req, res) => {

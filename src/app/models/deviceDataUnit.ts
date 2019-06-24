@@ -1,46 +1,46 @@
 export class DeviceDataUnit {
-  frame: Number
-  thermoCurrGasFlow: Number
-  thermoTarGasFlow: Number
-  thermoCurrGasPress: Number
-  thermoTarGasPress: Number
-  thermoGasVol: Number
-  thermoGasSupplPres: Number
-  thermoDeviceOn: Number
-  orLightsOff: Number
-  orLightsIntLight1: Number
-  orLightsIntLight2: Number
-  endLightSourceIntens: Number
-  endWhiteBal: Number
-  endGains: Number
-  endExposureIndex: Number
+  frame: number
+  thermoCurrGasFlow: number
+  thermoTarGasFlow: number
+  thermoCurrGasPress: number
+  thermoTarGasPress: number
+  thermoGasVol: number
+  thermoGasSupplPres: number
+  thermoDeviceOn: number
+  orLightsOff: number
+  orLightsIntLight1: number
+  orLightsIntLight2: number
+  endLightSourceIntens: number
+  endWhiteBal: number
+  endGains: number
+  endExposureIndex: number
 
-  constructor(frame: Number, thermoCurrGasFlow: Number, thermoTarGasFlow: Number, thermoCurrGasPress: Number,
-    thermoTarGasPress: Number,
-    thermoGasVol: Number,
-    thermoGasSupplPres: Number,
-    thermoDeviceOn: Number,
-    orLightsOff: Number,
-    orLightsIntLight1: Number,
-    orLightsIntLight2: Number,
-    endLightSourceIntens: Number,
-    endWhiteBal: Number,
-    endGains: Number,
-    endExposureIndex: Number) {
-      this.frame = frame;
-      this.thermoCurrGasFlow = thermoCurrGasFlow
-      this.thermoTarGasFlow = thermoTarGasFlow
-      this.thermoCurrGasPress = thermoCurrGasPress
-      this.thermoTarGasPress = thermoTarGasPress
-      this.thermoGasVol = thermoGasVol
-      this.thermoGasSupplPres = thermoGasSupplPres
-      this.thermoDeviceOn = thermoDeviceOn
-      this.orLightsOff = orLightsOff
-      this.orLightsIntLight1 = orLightsIntLight1
-      this.orLightsIntLight2 = orLightsIntLight2
-      this.endLightSourceIntens = endLightSourceIntens
-      this.endWhiteBal = endWhiteBal
-      this.endGains = endGains
-      this.endExposureIndex = endExposureIndex
-    }
+  constructor(frame: string, thermoCurrGasFlow: string, thermoTarGasFlow: string, thermoCurrGasPress: string,
+    thermoTarGasPress: string,
+    thermoGasVol: string,
+    thermoGasSupplPres: string,
+    thermoDeviceOn: string,
+    orLightsOff: string,
+    orLightsIntLight1: string,
+    orLightsIntLight2: string,
+    endLightSourceIntens: string,
+    endWhiteBal: string,
+    endGains: string,
+    endExposureIndex: string) {
+    this.frame = parseInt(frame);
+    this.thermoCurrGasFlow = parseInt(thermoCurrGasFlow)
+    this.thermoTarGasFlow = parseInt(thermoTarGasFlow)
+    this.thermoCurrGasPress = parseInt(thermoCurrGasPress)
+    this.thermoTarGasPress = parseInt(thermoTarGasPress)
+    this.thermoGasVol = parseInt(thermoGasVol)
+    this.thermoGasSupplPres = parseInt(thermoGasSupplPres)
+    this.thermoDeviceOn = parseInt(thermoDeviceOn)
+    this.orLightsOff = parseInt(orLightsOff)
+    this.orLightsIntLight1 = parseInt(orLightsIntLight1)
+    this.orLightsIntLight2 = parseInt(orLightsIntLight2)
+    this.endLightSourceIntens = parseInt(endLightSourceIntens)
+    this.endWhiteBal = parseInt(endWhiteBal)
+    this.endGains = parseInt(endGains)
+    this.endExposureIndex = parseInt(endExposureIndex)
+  }
 }

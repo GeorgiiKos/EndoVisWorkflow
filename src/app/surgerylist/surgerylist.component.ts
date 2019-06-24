@@ -9,6 +9,7 @@ import { Scale } from '../models/scale';
 import { DeviceData } from '../models/DeviceData';
 import { DeviceDataUnit } from '../models/deviceDataUnit';
 import { isObject } from 'util';
+import { PhaseCount } from '../models/phaseCount';
 
 @Component({
   selector: 'app-surgerylist',
@@ -67,32 +68,31 @@ export class SurgerylistComponent implements OnInit {
   public calcPhasePercentage(surgeryName: String) {
     var index = this.surgeryPhases.findIndex(d => d.name == surgeryName);
     var phases = this.surgeryPhases[index].phases;
-    var result = new Array();
+    var result: PhaseCount[] = [];
 
     var currVal = -1;
     var currIndex = -1;
     for (var i in phases) {
-      if (phases[i][1] != currVal) { // value changed
+      if (phases[i].phase != currVal) { // value changed
         currIndex++;
-        currVal = phases[i][1];
-        result.push([phases[i][1]])
-        result[currIndex].push(1)
+        currVal = phases[i].phase;
+        result.push(new PhaseCount(currVal, 1))
       } else {
-        result[currIndex][1] = result[currIndex][1] + 1;
+        result[currIndex].count = result[currIndex].count + 1;
       }
     }
 
     //console.log("THE RESULT FOR", surgeryName, result)
 
     var sum = 0
-    result.map(d => sum += d[1])
+    result.map(d => sum += d.count)
     //console.log("SUM: " + sum)
     var scaleFunc = d3.scaleLinear().domain([0, sum]).range([0, 100]);
 
     this.scaleFunctions.push(new Scale(surgeryName, scaleFunc));
 
     var phasesScaled = []
-    result.map(d => phasesScaled.push(new PhasePercentage(d[0], scaleFunc(d[1]))))
+    result.map(d => phasesScaled.push(new PhasePercentage(d.phaseNr, scaleFunc(d.count))))
 
     this.surgeryScale.push(new SurgeryScale(surgeryName, phasesScaled))
 
@@ -370,11 +370,34 @@ export class SurgerylistComponent implements OnInit {
   public fillPhasePercentageTable(surgeryName: String) {
     var table = d3.select('#' + surgeryName + "-phasePercentage").select("tbody");
     var surgeryPhases = this.surgeryPhases.find(d => d.name == surgeryName);
-    var roll = d3.nest().key(d => d[0]).rollup(d => d[1]).entries(surgeryPhases.phases)
-    console.log(roll)
+    var nested = d3.nest().key(d => d.phase).rollup(v => v.length).entries(surgeryPhases.phases)
 
-    //var row = table.append('tr').append('td').text("abc")
+    var scaleFunction = this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale;
 
+    var sum = 0
+    nested.map(d => sum += nested.value)
+
+    console.log(nested)
+    nested.sort((a, b) => a.key - b.key)
+
+    var phasesScaled = []
+    nested.map((d) => {
+      var dur = d.value / 25;
+      var hours = Math.floor(dur / 3600);
+      var minutes = Math.floor((dur / 60) % 60);
+      var seconds = Math.floor(dur % 60);
+
+      var hoursFormat = hours < 10 ? "0" + hours : hours;
+      var minutesFormat = minutes < 10 ? "0" + minutes : minutes;
+      var secondsFormat = seconds < 10 ? "0" + seconds : seconds;
+
+      var percentageObj = new PhasePercentage(parseInt(d.key), scaleFunction(d.value))
+      phasesScaled.push(percentageObj)
+      var row = table.append('tr');
+      row.append("th").attr("scope", "row").text(percentageObj.phaseNr);
+      row.append("td").text(hoursFormat + ":" + minutesFormat + ":" + secondsFormat);
+      row.append("td").text(percentageObj.percent.toFixed(2) + " %");
+    })
   }
 
   /*public expandCard(id: String) {

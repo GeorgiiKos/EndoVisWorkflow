@@ -1,8 +1,8 @@
 export class PhasePercentage {
-    phaseNr: Number
-    percent: Number
+    phaseNr: number
+    percent: number
 
-    constructor(phaseNr: Number, percent: Number) {
+    constructor(phaseNr: number, percent: number) {
         this.phaseNr = phaseNr;
         this.percent = percent
     }

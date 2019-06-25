@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 import { PhasePercentage } from '../models/phasePercentage';
 import { Surgery } from '../models/surgery';
@@ -8,7 +8,6 @@ import { DataService } from '../services/data.service';
 import { Scale } from '../models/scale';
 import { DeviceData } from '../models/DeviceData';
 import { DeviceDataUnit } from '../models/deviceDataUnit';
-import { isObject } from 'util';
 import { PhaseCount } from '../models/phaseCount';
 
 @Component({
@@ -47,7 +46,7 @@ export class SurgerylistComponent implements OnInit {
       })
   }
 
-  public loadSurgeryPhases(surgeryName: String) {
+  public loadSurgeryPhases(surgeryName: string) {
     this.dataService.getPhasesArray(surgeryName)
       .subscribe(response => {
         this.surgeryPhases.push(response); // TODO: check doubles
@@ -57,11 +56,12 @@ export class SurgerylistComponent implements OnInit {
       })
   }
 
-  public loadDeviceData(surgeryName: String) {
+  public loadDeviceData(surgeryName: string) {
     this.dataService.getDeviceArray(surgeryName)
       .subscribe(response => {
         this.deviceData.push(response);
-        this.calcDevicePercentage(surgeryName);
+        this.drawDeviceAxes(surgeryName)
+        this.drawDeviceGraph(surgeryName, "thermoCurrGasFlow");
       })
   }
 
@@ -99,59 +99,185 @@ export class SurgerylistComponent implements OnInit {
     this.drawBars(surgeryName);
   }
 
-  public calcDevicePercentage(surgeryName: String) {
+  public drawDeviceAxes(surgeryName: string) {
     var index = this.deviceData.findIndex(d => d.name == surgeryName);
     var length = this.deviceData[index].data.length;
     var svgWidth = parseFloat(d3.select('#' + surgeryName).style("width"));
 
-    this.deviceData[index].data = this.createBinsMiddle(this.deviceData[index].data)
-    //console.log(this.deviceData[index].data)
+    var scaleFuncX1 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY1 = d3.scaleLinear().domain([-1, 300]).range([200, 0]);
 
-    var min = d3.min(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
-    var max = d3.max(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
+    var scaleFuncX2 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY2 = d3.scaleLinear().domain([-1, 5100]).range([200, 0]);
 
-    var scaleFuncX = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    //var scaleFuncX2 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY = d3.scaleLinear().domain([0, 200]).range([200, 0]);
+    var scaleFuncX3 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY3 = d3.scaleLinear().domain([-1, 1]).range([200, 0]);
 
-    var valueline = d3.line()
-      .x(function (d, i) { return scaleFuncX(d.frame); })
-      .y(function (d) { return scaleFuncY(d.thermoCurrGasFlow); })
-    //.curve(d3.curveMonotoneX) // apply smoothing to the line
-
-    var valueline2 = d3.line()
-      .x(function (d, i) { return scaleFuncX(d.frame); })
-      .y(function (d) { return scaleFuncY(d.thermoCurrGasPress); })
-
-    var svg = d3.select('#graph1-' + surgeryName)
+    var svg1 = d3.select('#graph1-' + surgeryName)
+      .attr("transform", "translate(0, 10)");
+    var svg2 = d3.select('#graph2-' + surgeryName)
+      .attr("transform", "translate(0, 10)");
+    var svg3 = d3.select('#graph3-' + surgeryName)
       .attr("transform", "translate(0, 10)");
 
-    svg.append("path")
-      .datum(this.deviceData[index].data)
-      .attr("d", valueline)
-      .attr("transform", "translate(" + this.svgMargin + ", 0)")
-      .attr("fill", "none")
-      .attr("stroke", "#ffab00")
-      .attr("stroke-width", "1")
+    // Call the x axis in a group tag
+    svg1.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(" + this.svgMargin + ", 200)")
+      .call(d3.axisBottom(scaleFuncX1)); // Create an axis component with d3.axisBottom
 
-    svg.append("path")
-      .datum(this.deviceData[index].data)
-      .attr("d", valueline2)
-      .attr("transform", "translate(" + this.svgMargin + ", 0)")
-      .attr("fill", "none")
-      .attr("stroke", "#ff00ff")
-      .attr("stroke-width", "1")
+    svg1.append("g")
+      .attr("class", "y-axis")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY1)); // Create an axis component with d3.axisLeft
 
     // Call the x axis in a group tag
-    svg.append("g")
-      .attr("class", "x axis")
+    svg2.append("g")
+      .attr("class", "x-axis")
       .attr("transform", "translate(" + this.svgMargin + ", 200)")
-      .call(d3.axisBottom(scaleFuncX)); // Create an axis component with d3.axisBottom
+      .call(d3.axisBottom(scaleFuncX2)); // Create an axis component with d3.axisBottom
 
-    svg.append("g")
-      .attr("class", "y axis")
+    svg2.append("g")
+      .attr("class", "y-axis")
       .attr("transform", "translate(" + this.svgMargin + " ,0)")
-      .call(d3.axisLeft(scaleFuncY)); // Create an axis component with d3.axisLeft
+      .call(d3.axisLeft(scaleFuncY2).tickFormat(d3.format(".2s"))); // Create an axis component with d3.axisLeft
+
+    // Call the x axis in a group tag
+    svg3.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(" + this.svgMargin + ", 200)")
+      .call(d3.axisBottom(scaleFuncX3)); // Create an axis component with d3.axisBottom
+
+    svg3.append("g")
+      .attr("class", "y-axis")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY3)); // Create an axis component with d3.axisLeft
+
+    d3.selectAll(".y-axis .tick line:not(:nth-child(2)):not(:last-child)").attr("x2", svgWidth).style("stroke", "lightgrey");
+  }
+
+  public drawDeviceGraph(surgeryName: string, graph: string) {
+    var index = this.deviceData.findIndex(d => d.name == surgeryName);
+    var length = this.deviceData[index].data.length;
+    var svgWidth = parseFloat(d3.select('#' + surgeryName).style("width"));
+
+    var binnedData = this.createBinsMiddle(this.deviceData[index].data)
+
+    //var min = d3.min(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
+    //var max = d3.max(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
+
+    var scaleFuncX1 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY1 = d3.scaleLinear().domain([-1, 300]).range([200, 0]);
+
+    var scaleFuncX2 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY2 = d3.scaleLinear().domain([-1, 5100]).range([200, 0]);
+
+    var scaleFuncX3 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY3 = d3.scaleLinear().domain([-1, 1]).range([200, 0]);
+
+    var svg1 = d3.select('#graph1-' + surgeryName);
+    var svg2 = d3.select('#graph2-' + surgeryName)
+    var svg3 = d3.select('#graph3-' + surgeryName)
+
+
+    var drawLine = (data: DeviceDataUnit[], valueline: any, svg: any, color: string, id: string) => {
+      svg.append("path")
+        .datum(data)
+        .attr("d", valueline)
+        .attr("transform", "translate(" + this.svgMargin + ", 0)")
+        .attr("fill", "none")
+        .attr("stroke", color)
+        .attr("stroke-width", "2")
+        .attr("id", id)
+    }
+
+    switch (graph) {
+      case "thermoCurrGasFlow":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.thermoCurrGasFlow); })
+        drawLine(binnedData, valueline, svg1, "#f50000", "path-thermoCurrGasFlow-" + surgeryName);
+        break;
+      case "thermoTarGasFlow":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.thermoTarGasFlow); })
+        drawLine(this.deviceData[index].data, valueline, svg1, "#b800a7", "path-thermoTarGasFlow-" + surgeryName);
+        break;
+      case "thermoCurrGasPress":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.thermoCurrGasPress); })
+        drawLine(binnedData, valueline, svg1, "#a400ff", "path-thermoCurrGasPress-" + surgeryName);
+        break;
+      case "thermoTarGasPress":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.thermoTarGasPress); })
+        drawLine(binnedData, valueline, svg1, "#5b009c", "path-thermoTarGasPress-" + surgeryName);
+        break;
+      case "thermoGasVol":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX2(d.frame); })
+          .y(function (d) { return scaleFuncY2(d.thermoGasVol); })
+        drawLine(binnedData, valueline, svg2, "#0000ff", "path-thermoGasVol-" + surgeryName);
+        break;
+      case "thermoGasSupplPres":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX2(d.frame); })
+          .y(function (d) { return scaleFuncY2(d.thermoGasSupplPres); })
+        drawLine(binnedData, valueline, svg2, "#259f9f", "path-thermoGasSupplPres-" + surgeryName);
+        break;
+      case "thermoDeviceOn":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX3(d.frame); })
+          .y(function (d) { return scaleFuncY3(d.thermoDeviceOn); })
+        drawLine(binnedData, valueline, svg3, "#196900", "path-thermoDeviceOn-" + surgeryName);
+        break;
+      case "orLightsOff":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX3(d.frame); })
+          .y(function (d) { return scaleFuncY3(d.orLightsOff); })
+        drawLine(binnedData, valueline, svg3, "#3eff00", "path-orLightsOff-" + surgeryName);
+        break;
+      case "orLightsIntLight1":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.orLightsIntLight1); })
+        drawLine(binnedData, valueline, svg1, "#ffff00", "path-orLightsIntLight1-" + surgeryName);
+        break;
+      case "orLightsIntLight2":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.orLightsIntLight2); })
+        drawLine(binnedData, valueline, svg1, "#f9a700", "path-orLightsIntLight2-" + surgeryName);
+        break;
+      case "endLightSourceIntens":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX1(d.frame); })
+          .y(function (d) { return scaleFuncY1(d.endLightSourceIntens); })
+        drawLine(binnedData, valueline, svg1, "#f76c00", "path-endLightSourceIntens-" + surgeryName);
+        break;
+      case "endWhiteBal":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX3(d.frame); })
+          .y(function (d) { return scaleFuncY3(d.endWhiteBal); })
+        drawLine(binnedData, valueline, svg3, "#f53200", "path-endWhiteBal-" + surgeryName);
+        break;
+      case "endGains":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX2(d.frame); })
+          .y(function (d) { return scaleFuncY2(d.endGains); })
+        drawLine(binnedData, valueline, svg2, "#696969", "path-endGains-" + surgeryName);
+        break;
+      case "endExposureIndex":
+        var valueline = d3.line()
+          .x(function (d, i) { return scaleFuncX2(d.frame); })
+          .y(function (d) { return scaleFuncY2(d.endExposureIndex); })
+        drawLine(binnedData, valueline, svg2, "#000000", "path-endExposureIndex-" + surgeryName);
+        break;
+    }
+    //svg.select(".y-axis").select(".domain").remove();
   }
 
   public createBinsMiddle(arr: DeviceDataUnit[]) {
@@ -344,6 +470,8 @@ export class SurgerylistComponent implements OnInit {
       var newX = d3.mouse(svg.node())[0];
       //console.log(newX)
       line.raise().attr("x1", newX).attr("x2", newX);
+      line2.raise().attr("x1", newX + 30).attr("x2", newX + 30);
+
       imgTip.style("left", (newX + this.svgMargin - 10) + "px")
 
       if ((newX + 102 - 10) <= svgWidth) {
@@ -361,11 +489,6 @@ export class SurgerylistComponent implements OnInit {
     imgTip.call(d3.drag().on("drag", drag))
     imgFrame.call(d3.drag().on("drag", drag))
   }
-
-  /*public drawLineGraph(surgeryName: String) {
-    var svg = d3.select('#' + surgeryName)
-    svg.append("")
-  }*/
 
   public fillPhasePercentageTable(surgeryName: String) {
     var table = d3.select('#' + surgeryName + "-phasePercentage").select("tbody");
@@ -395,9 +518,20 @@ export class SurgerylistComponent implements OnInit {
       phasesScaled.push(percentageObj)
       var row = table.append('tr');
       row.append("th").attr("scope", "row").text(percentageObj.phaseNr);
-      row.append("td").text(hoursFormat + ":" + minutesFormat + ":" + secondsFormat);
-      row.append("td").text(percentageObj.percent.toFixed(2) + " %");
+      row.append("td").text(hoursFormat + ":" + minutesFormat + ":" + secondsFormat + " (" + percentageObj.percent.toFixed(2) + "%)");
     })
+  }
+
+  public checkedEvent(event: any, surgeryName: string, graph: string) {
+    if (!event.currentTarget.checked) {
+      console.log("DELETING" + " #path-" + graph + "-" + surgeryName)
+      d3.select("#path-" + graph + "-" + surgeryName).remove()
+    } else {
+      console.log(event.currentTarget.checked);
+      console.log(surgeryName);
+      console.log(graph)
+      this.drawDeviceGraph(surgeryName, graph)
+    }
   }
 
   /*public expandCard(id: String) {

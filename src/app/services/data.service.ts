@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
-import { DeviceData } from '../models/DeviceData';
+import { DeviceData } from '../models/deviceData';
 import { DeviceDataUnit } from '../models/deviceDataUnit';
 import { Phase } from '../models/phase';
 import { Surgery } from '../models/surgery';

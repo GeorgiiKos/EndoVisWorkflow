@@ -400,31 +400,33 @@ export class SurgerylistComponent implements OnInit {
         .attr("fill", () => {
           switch (Number(d.phaseNr)) {
             case 0:
-              return "#fe2712"
+              return "#f50000"
             case 1:
-              return "#fe2712"
+              return "#b800a7"
             case 2:
-              return "#a7194b"
+              return "#a400ff"
             case 3:
-              return "#8601af"
+              return "#5b009c"
             case 4:
-              return "#3d01a4"
+              return "#0000ff"
             case 5:
-              return "#0247fe"
+              return "#259f9f"
             case 6:
-              return "#0392ce"
+              return "#196900"
             case 7:
-              return "#66b032"
+              return "#3eff00"
             case 8:
-              return "#d0ea2b"
+              return "#ffff00"
             case 9:
-              return "#fefe33"
+              return "#f9a700"
             case 10:
-              return "#fabc02"
+              return "#f76c00"
             case 11:
-              return "#fb9902"
+              return "#f53200"
             case 12:
-              return "#8e8e8e"
+              return "#696969"
+            case 13:
+              return "#000000"
           }
         })
       prevPos = prevPos + d.percent.valueOf();

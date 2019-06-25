@@ -90,8 +90,8 @@ app.get('/api/getImage', (req, res) => {
   res.sendFile(files.mediaContent.output + "/" + surgery + "/frame" + frameNr + ".jpg")
 });
 
-app.get('/api/getDevice', (req, res) => {
-  res.sendFile(files.deviceData[1])
+app.get('/api/getInstrumentArray', (req, res) => {
+  res.sendFile(files.csvLocation + "/InstrumentAnnotation/" + req.query.surgeryName + ".csv");
 });
 
 app.listen(8000, () => {

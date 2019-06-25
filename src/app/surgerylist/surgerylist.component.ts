@@ -41,6 +41,7 @@ export class SurgerylistComponent implements OnInit {
         this.surgeryList = response;
         for (let i in this.surgeryList) {
           this.surgeryList[i].loading = true
+          this.surgeryList[i].collapsed = true
           this.loadSurgeryPhases(this.surgeryList[i].name)
         }
       })
@@ -105,13 +106,13 @@ export class SurgerylistComponent implements OnInit {
     var svgWidth = parseFloat(d3.select('#' + surgeryName).style("width"));
 
     var scaleFuncX1 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY1 = d3.scaleLinear().domain([-1, 300]).range([200, 0]);
+    var scaleFuncY1 = d3.scaleLinear().domain([-1, 300]).range([150, 0]);
 
     var scaleFuncX2 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY2 = d3.scaleLinear().domain([-1, 5100]).range([200, 0]);
+    var scaleFuncY2 = d3.scaleLinear().domain([-1, 7500]).range([150, 0]);
 
     var scaleFuncX3 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY3 = d3.scaleLinear().domain([-1, 1]).range([200, 0]);
+    var scaleFuncY3 = d3.scaleLinear().domain([-1, 1]).range([150, 0]);
 
     var svg1 = d3.select('#graph1-' + surgeryName)
       .attr("transform", "translate(0, 10)");
@@ -123,7 +124,7 @@ export class SurgerylistComponent implements OnInit {
     // Call the x axis in a group tag
     svg1.append("g")
       .attr("class", "x-axis")
-      .attr("transform", "translate(" + this.svgMargin + ", 200)")
+      .attr("transform", "translate(" + this.svgMargin + ", 150)")
       .call(d3.axisBottom(scaleFuncX1)); // Create an axis component with d3.axisBottom
 
     svg1.append("g")
@@ -134,7 +135,7 @@ export class SurgerylistComponent implements OnInit {
     // Call the x axis in a group tag
     svg2.append("g")
       .attr("class", "x-axis")
-      .attr("transform", "translate(" + this.svgMargin + ", 200)")
+      .attr("transform", "translate(" + this.svgMargin + ", 150)")
       .call(d3.axisBottom(scaleFuncX2)); // Create an axis component with d3.axisBottom
 
     svg2.append("g")
@@ -145,7 +146,7 @@ export class SurgerylistComponent implements OnInit {
     // Call the x axis in a group tag
     svg3.append("g")
       .attr("class", "x-axis")
-      .attr("transform", "translate(" + this.svgMargin + ", 200)")
+      .attr("transform", "translate(" + this.svgMargin + ", 150)")
       .call(d3.axisBottom(scaleFuncX3)); // Create an axis component with d3.axisBottom
 
     svg3.append("g")
@@ -153,7 +154,36 @@ export class SurgerylistComponent implements OnInit {
       .attr("transform", "translate(" + this.svgMargin + " ,0)")
       .call(d3.axisLeft(scaleFuncY3)); // Create an axis component with d3.axisLeft
 
-    d3.selectAll(".y-axis .tick line:not(:nth-child(2)):not(:last-child)").attr("x2", svgWidth).style("stroke", "lightgrey");
+    // add horizontal grid
+    svg1.append("g")
+      .attr("class", "grid")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY1)
+        .tickSize(-svgWidth)
+        .tickFormat(""));
+
+    d3.selectAll(".grid line").style("stroke", "lightgrey");
+    d3.selectAll(".grid path").style("stroke-width", "0");
+
+    svg2.append("g")
+      .attr("class", "grid")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY2)
+        .tickSize(-svgWidth)
+        .tickFormat(""));
+
+    d3.selectAll(".grid line").style("stroke", "lightgrey");
+    d3.selectAll(".grid path").style("stroke-width", "0");
+
+    svg3.append("g")
+      .attr("class", "grid")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY3)
+        .tickSize(-svgWidth)
+        .tickFormat(""));
+
+    d3.selectAll(".grid line").style("stroke", "lightgrey");
+    d3.selectAll(".grid path").style("stroke-width", "0");
   }
 
   public drawDeviceGraph(surgeryName: string, graph: string) {
@@ -167,18 +197,17 @@ export class SurgerylistComponent implements OnInit {
     //var max = d3.max(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
 
     var scaleFuncX1 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY1 = d3.scaleLinear().domain([-1, 300]).range([200, 0]);
+    var scaleFuncY1 = d3.scaleLinear().domain([-1, 300]).range([150, 0]);
 
     var scaleFuncX2 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY2 = d3.scaleLinear().domain([-1, 5100]).range([200, 0]);
+    var scaleFuncY2 = d3.scaleLinear().domain([-1, 7500]).range([150, 0]);
 
     var scaleFuncX3 = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
-    var scaleFuncY3 = d3.scaleLinear().domain([-1, 1]).range([200, 0]);
+    var scaleFuncY3 = d3.scaleLinear().domain([-1, 1]).range([150, 0]);
 
     var svg1 = d3.select('#graph1-' + surgeryName);
     var svg2 = d3.select('#graph2-' + surgeryName)
     var svg3 = d3.select('#graph3-' + surgeryName)
-
 
     var drawLine = (data: DeviceDataUnit[], valueline: any, svg: any, color: string, id: string) => {
       svg.append("path")
@@ -277,7 +306,6 @@ export class SurgerylistComponent implements OnInit {
         drawLine(binnedData, valueline, svg2, "#000000", "path-endExposureIndex-" + surgeryName);
         break;
     }
-    //svg.select(".y-axis").select(".domain").remove();
   }
 
   public createBinsMiddle(arr: DeviceDataUnit[]) {
@@ -505,23 +533,34 @@ export class SurgerylistComponent implements OnInit {
     console.log(nested)
     nested.sort((a, b) => a.key - b.key)
 
-    var phasesScaled = []
-    nested.map((d) => {
-      var dur = d.value / 25;
-      var hours = Math.floor(dur / 3600);
-      var minutes = Math.floor((dur / 60) % 60);
-      var seconds = Math.floor(dur % 60);
+    var display = (data) => {
 
-      var hoursFormat = hours < 10 ? "0" + hours : hours;
-      var minutesFormat = minutes < 10 ? "0" + minutes : minutes;
-      var secondsFormat = seconds < 10 ? "0" + seconds : seconds;
+      for (var i = 0; i < 14; i++) {
+        var foundObj = data.find((d => d.key == i));
+        console.log(foundObj)
+        if (foundObj !== undefined) {
+          var dur = foundObj.value / 25;
+          var hours = Math.floor(dur / 3600);
+          var minutes = Math.floor((dur / 60) % 60);
+          var seconds = Math.floor(dur % 60);
 
-      var percentageObj = new PhasePercentage(parseInt(d.key), scaleFunction(d.value))
-      phasesScaled.push(percentageObj)
-      var row = table.append('tr');
-      row.append("th").attr("scope", "row").text(percentageObj.phaseNr);
-      row.append("td").text(hoursFormat + ":" + minutesFormat + ":" + secondsFormat + " (" + percentageObj.percent.toFixed(2) + "%)");
-    })
+          var hoursFormat = hours < 10 ? "0" + hours : hours;
+          var minutesFormat = minutes < 10 ? "0" + minutes : minutes;
+          var secondsFormat = seconds < 10 ? "0" + seconds : seconds;
+
+          var percentageObj = new PhasePercentage(parseInt(foundObj.key), scaleFunction(foundObj.value))
+
+          var row = table.append('tr');
+          var th = row.append("th").attr("scope", "row").text(percentageObj.phaseNr);
+          row.append("td").text(hoursFormat + ":" + minutesFormat + ":" + secondsFormat + " (" + percentageObj.percent.toFixed(2) + "%)");
+        } else {
+          var row = table.append('tr').style("background-color", "#ffe5e5");
+          row.append("th").attr("scope", "row").text(i);
+          row.append("td").text("Phase was neglected!");
+        }
+      }
+    }
+    display(nested)
   }
 
   public checkedEvent(event: any, surgeryName: string, graph: string) {
@@ -529,15 +568,20 @@ export class SurgerylistComponent implements OnInit {
       console.log("DELETING" + " #path-" + graph + "-" + surgeryName)
       d3.select("#path-" + graph + "-" + surgeryName).remove()
     } else {
-      console.log(event.currentTarget.checked);
-      console.log(surgeryName);
-      console.log(graph)
       this.drawDeviceGraph(surgeryName, graph)
     }
   }
 
-  /*public expandCard(id: String) {
-    console.log(id)
-  }*/
+  public collapseDiv(id: string) {
+    var index = this.surgeryList.findIndex(d => d.name == id);
+    if (this.surgeryList[index].collapsed) {
+      d3.select("#expand-" + id).style("display", "")
+      this.surgeryList[index].collapsed = false;
+    } else {
+      d3.select("#expand-" + id).style("display", "none");
+      this.surgeryList[index].collapsed = true;
+
+    }
+  }
 
 }

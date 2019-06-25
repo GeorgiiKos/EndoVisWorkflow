@@ -8,5 +8,6 @@ export class Surgery {
     s: number
     frameWidth: number
     frameHeight: number
+    collapsed: boolean;
     loading: boolean
 }

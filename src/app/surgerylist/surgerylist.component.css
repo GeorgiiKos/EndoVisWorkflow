@@ -1,7 +1,12 @@
-.card-clicked {
-    height: 500px;
-    transition: height 1s;
+.card {
+    min-height: 300px;
+    transition: height 3s;
     transition-timing-function: ease-in-out;
+}
+
+.surgery-name {
+    user-select: none;
+    cursor: pointer;
 }
 
 ::ng-deep div.ttip {

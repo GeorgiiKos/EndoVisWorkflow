@@ -1,169 +1,188 @@
 <div *ngFor="let surgery of surgeryList">
-  <div class="card my-2">
+  <div class="card my-4">
     <div class="card-body p-0" attr.id="card-{{ surgery.name }}">
       <div style="padding-left: 30px; padding-right: 30px">
         <div style="padding-top: 30px; padding-bottom: 30px">
-          <h5 class="card-title">{{surgery.name}} <span class="badge badge-info">{{surgery.type}}</span></h5>
+          <h5 class="card-title"><span class="surgery-name" (click)="collapseDiv(surgery.name)">{{surgery.name}}</span>
+            <span class="badge badge-info">{{surgery.type}}</span></h5>
           <h6 class="card-subtitle mb-2 text-muted">{{surgery.h}}:{{surgery.m}}:{{surgery.s}}</h6>
-          <div class="bg-light text-center" *ngIf="surgery.loading" style="height:40px; width: 100%;">
-            <div class="spinner-border text-primary" style="width: 40px; height: 40px" role="status">
-              <span class="sr-only">Loading...</span>
-            </div>
+          <div *ngIf="surgery.loading" class="spinner-border text-primary"
+            style="width: 40px; height: 40px; position: absolute; left:50%; top: 178.6px" role="status">
+            <span class="sr-only">Loading...</span>
           </div>
         </div>
-        <svg [ngClass]="surgery.loading ? 'd-none' : ''" attr.id="{{ surgery.name }}" width="100%" height="150px">
+        <svg attr.id="{{ surgery.name }}" width="100%" height="120px">
         </svg>
       </div>
-      <svg width="100%" height="240px">
-        <g attr.id="graph1-{{ surgery.name }}"></g>
-      </svg>
-      <svg width="100%" height="240px">
-        <g attr.id="graph2-{{ surgery.name }}"></g>
-      </svg>
-      <svg width="100%" height="240px">
-        <g attr.id="graph3-{{ surgery.name }}"></g>
-      </svg>
 
-      <div style="padding-left: 30px; padding-right: 30px; margin-top: 30px">
+      <div id="expand-{{ surgery.name }}" style="display: none">
 
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th scope="col">Thermoflator</th>
-              <th scope="col">OR lights</th>
-              <th scope="col">Endoscopic light source</th>
-              <th scope="col">Endoscope</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="thermoCurrGasFlow" checked
-                    (change)="checkedEvent($event, surgery.name, 'thermoCurrGasFlow')">
-                  <label class="form-check-label" for="thermoCurrGasFlow">
-                    Current gas flow rate
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="checkbox-thermoTarGasFlow"
-                    (change)="checkedEvent($event, surgery.name, 'thermoTarGasFlow')">
-                  <label class="form-check-label" for="thermoTarGasFlow">
-                    Target gas flow rate
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="thermoCurrGasPress"
-                    (change)="checkedEvent($event, surgery.name, 'thermoCurrGasPress')">
-                  <label class="form-check-label" for="thermoCurrGasPress">
-                    Current gas pressure
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="thermoTarGasPress"
-                    (change)="checkedEvent($event, surgery.name, 'thermoTarGasPress')">
-                  <label class="form-check-label" for="thermoTarGasPress">
-                    Target gas pressure
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="thermoGasVol"
-                    (change)="checkedEvent($event, surgery.name, 'thermoGasVol')">
-                  <label class="form-check-label" for="thermoGasVol">
-                    Used gas volume
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="thermoGasSupplPres"
-                    (change)="checkedEvent($event, surgery.name, 'thermoGasSupplPres')">
-                  <label class="form-check-label" for="thermoGasSupplPres">
-                    Gas supply pressure
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="thermoDeviceOn"
-                    (change)="checkedEvent($event, surgery.name, 'thermoDeviceOn')">
-                  <label class="form-check-label" for="thermoDeviceOn">
-                    Device on?
-                  </label>
-                </div>
-              </td>
-              <td>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="orLightsOff"
-                    (change)="checkedEvent($event, surgery.name, 'orLightsOff')">
-                  <label class="form-check-label" for="orLightsOff">
-                    All lights off?
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="orLightsIntLight1"
-                    (change)="checkedEvent($event, surgery.name, 'orLightsIntLight1')">
-                  <label class="form-check-label" for="orLightsIntLight1">
-                    Intensity light 1
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="orLightsIntLight2"
-                    (change)="checkedEvent($event, surgery.name, 'orLightsIntLight2')">
-                  <label class="form-check-label" for="orLightsIntLight2">
-                    Intensity light 2
-                  </label>
-                </div>
-              </td>
-              <td>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="endLightSourceIntens"
-                    (change)="checkedEvent($event, surgery.name, 'endLightSourceIntens')">
-                  <label class="form-check-label" for="endLightSourceIntens">
-                    Intensity
-                  </label>
-                </div>
-              </td>
-              <td>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="endWhiteBal"
-                    (change)="checkedEvent($event, surgery.name, 'endWhiteBal')">
-                  <label class="form-check-label" for="endWhiteBal">
-                    White balance
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="endGains"
-                    (change)="checkedEvent($event, surgery.name, 'endGains')">
-                  <label class="form-check-label" for="endGains">
-                    Gains
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="endExposureIndex"
-                    (change)="checkedEvent($event, surgery.name, 'endExposureIndex')">
-                  <label class="form-check-label" for="endExposureIndex">
-                    Exposure index
-                  </label>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <svg width="100%" height="180px">
+          <g attr.id="graph1-{{ surgery.name }}"></g>
+        </svg>
+        <svg width="100%" height="180px">
+          <g attr.id="graph2-{{ surgery.name }}"></g>
+        </svg>
+        <svg width="100%" height="180px">
+          <g attr.id="graph3-{{ surgery.name }}"></g>
+        </svg>
+
+        <div style="padding-left: 30px; padding-right: 30px">
+
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th style="border-top:0">Thermoflator</th>
+                <th style="border-top:0">OR lights</th>
+                <th style="border-top:0">Endoscopic light source</th>
+                <th style="border-top:0">Endoscope</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="thermoCurrGasFlow" checked
+                      (change)="checkedEvent($event, surgery.name, 'thermoCurrGasFlow')">
+                    <label class="form-check-label" for="thermoCurrGasFlow">
+                      Current gas flow rate
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #f50000; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="checkbox-thermoTarGasFlow"
+                      (change)="checkedEvent($event, surgery.name, 'thermoTarGasFlow')">
+                    <label class="form-check-label" for="thermoTarGasFlow">
+                      Target gas flow rate
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #b800a7; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="thermoCurrGasPress"
+                      (change)="checkedEvent($event, surgery.name, 'thermoCurrGasPress')">
+                    <label class="form-check-label" for="thermoCurrGasPress">
+                      Current gas pressure
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #a400ff; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="thermoTarGasPress"
+                      (change)="checkedEvent($event, surgery.name, 'thermoTarGasPress')">
+                    <label class="form-check-label" for="thermoTarGasPress">
+                      Target gas pressure
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #5b009c; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="thermoGasVol"
+                      (change)="checkedEvent($event, surgery.name, 'thermoGasVol')">
+                    <label class="form-check-label" for="thermoGasVol">
+                      Used gas volume
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #0000ff; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="thermoGasSupplPres"
+                      (change)="checkedEvent($event, surgery.name, 'thermoGasSupplPres')">
+                    <label class="form-check-label" for="thermoGasSupplPres">
+                      Gas supply pressure
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #259f9f; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="thermoDeviceOn"
+                      (change)="checkedEvent($event, surgery.name, 'thermoDeviceOn')">
+                    <label class="form-check-label" for="thermoDeviceOn">
+                      Device on?
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #196900; display: inline-block"></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="orLightsOff"
+                      (change)="checkedEvent($event, surgery.name, 'orLightsOff')">
+                    <label class="form-check-label" for="orLightsOff">
+                      All lights off?
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #3eff00; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="orLightsIntLight1"
+                      (change)="checkedEvent($event, surgery.name, 'orLightsIntLight1')">
+                    <label class="form-check-label" for="orLightsIntLight1">
+                      Intensity light 1
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #ffff00; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="orLightsIntLight2"
+                      (change)="checkedEvent($event, surgery.name, 'orLightsIntLight2')">
+                    <label class="form-check-label" for="orLightsIntLight2">
+                      Intensity light 2
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #f9a700; display: inline-block"></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="endLightSourceIntens"
+                      (change)="checkedEvent($event, surgery.name, 'endLightSourceIntens')">
+                    <label class="form-check-label" for="endLightSourceIntens">
+                      Intensity
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #f76c00; display: inline-block"></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="endWhiteBal"
+                      (change)="checkedEvent($event, surgery.name, 'endWhiteBal')">
+                    <label class="form-check-label" for="endWhiteBal">
+                      White balance
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #f53200; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="endGains"
+                      (change)="checkedEvent($event, surgery.name, 'endGains')">
+                    <label class="form-check-label" for="endGains">
+                      Gains
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #696969; display: inline-block"></div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="endExposureIndex"
+                      (change)="checkedEvent($event, surgery.name, 'endExposureIndex')">
+                    <label class="form-check-label" for="endExposureIndex">
+                      Exposure index
+                    </label>
+                    <div style="height: 10px; width: 10px; background-color: #000000; display: inline-block"></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
 
 
 
 
-      <div style="padding-left: 30px; padding-right: 30px; margin-top: 30px">
-        <h4>Phase percentage</h4>
-        <table class="table table-sm table-hover" id="{{ surgery.name }}-phasePercentage">
-          <thead>
-            <tr>
-              <th scope="col">Phase</th>
-              <th scope="col">Duration</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
+        <div style="padding-left: 30px; padding-right: 30px; margin-top: 30px">
+          <h4>Phase percentage</h4>
+          <table class="table table-sm table-hover" id="{{ surgery.name }}-phasePercentage">
+            <thead>
+              <tr>
+                <th scope="col">Phase</th>
+                <th scope="col">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
     </div>

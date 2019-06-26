@@ -11,19 +11,20 @@
             <span class="sr-only">Loading...</span>
           </div>
         </div>
-        <svg attr.id="{{ surgery.name }}" width="100%" height="120px">
-        </svg>
       </div>
+
+      <svg attr.id="{{ surgery.name }}" width="100%" height="120px">
+      </svg>
 
       <div id="expand-{{ surgery.name }}" style="display: none">
 
-        <svg width="100%" height="180px">
+        <svg width="100%" height="180px" id="graph1-{{ surgery.name }}-svg">
           <g attr.id="graph1-{{ surgery.name }}"></g>
         </svg>
-        <svg width="100%" height="180px">
+        <svg width="100%" height="180px" id="graph2-{{ surgery.name }}-svg">
           <g attr.id="graph2-{{ surgery.name }}"></g>
         </svg>
-        <svg width="100%" height="180px">
+        <svg width="100%" height="180px" id="graph3-{{ surgery.name }}-svg">
           <g attr.id="graph3-{{ surgery.name }}"></g>
         </svg>
 

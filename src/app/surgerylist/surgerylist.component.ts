@@ -141,7 +141,7 @@ export class SurgerylistComponent implements OnInit {
     svg2.append("g")
       .attr("class", "y-axis")
       .attr("transform", "translate(" + this.svgMargin + " ,0)")
-      .call(d3.axisLeft(scaleFuncY2).tickFormat(d3.format(".2s"))); // Create an axis component with d3.axisLeft
+      .call(d3.axisLeft(scaleFuncY2).ticks(16).tickFormat(d3.format(".2s"))); // Create an axis component with d3.axisLeft
 
     // Call the x axis in a group tag
     svg3.append("g")
@@ -169,6 +169,7 @@ export class SurgerylistComponent implements OnInit {
       .attr("class", "grid")
       .attr("transform", "translate(" + this.svgMargin + " ,0)")
       .call(d3.axisLeft(scaleFuncY2)
+        .ticks(16)
         .tickSize(-svgWidth)
         .tickFormat(""));
 
@@ -231,7 +232,7 @@ export class SurgerylistComponent implements OnInit {
         var valueline = d3.line()
           .x(function (d, i) { return scaleFuncX1(d.frame); })
           .y(function (d) { return scaleFuncY1(d.thermoTarGasFlow); })
-        drawLine(this.deviceData[index].data, valueline, svg1, "#b800a7", "path-thermoTarGasFlow-" + surgeryName);
+        drawLine(binnedData, valueline, svg1, "#b800a7", "path-thermoTarGasFlow-" + surgeryName);
         break;
       case "thermoCurrGasPress":
         var valueline = d3.line()
@@ -408,9 +409,9 @@ export class SurgerylistComponent implements OnInit {
             .duration(300)
             .style("opacity", .9);
           div.html("Phase: " + d.phaseNr)
-            .style("left", (rectCoords.x + (rectCoords.width / 2)) + "px") // minus padding
+            .style("left", (rectCoords.x + (rectCoords.width / 2)) - 30 + "px") // minus padding
             .style("top", "141px"); // 30 + 24 + 12 - 6 + 20.6 + 8 + 30 + 60 - 10 - 27.6
-          tip.style("left", (rectCoords.x + (rectCoords.width / 2) + 25) + "px")
+          tip.style("left", (rectCoords.x + (rectCoords.width / 2) + 25) - 30 + "px")
             .style("top", "168.6px"); // 30 + 24 + 12 - 6 + 20.6 + 8 + 30 + 60 - 10
         })
         .on("mouseout", function () {
@@ -484,9 +485,9 @@ export class SurgerylistComponent implements OnInit {
 
       line.attr("x1", newX < this.svgMargin ? this.svgMargin : newX > svgWidth - this.svgMargin ? svgWidth - this.svgMargin : newX).attr("x2", newX < this.svgMargin ? this.svgMargin : newX > svgWidth - this.svgMargin ? svgWidth - this.svgMargin : newX);
       var updatedX = parseFloat(line.attr("x1"))
-      line2.attr("x1",updatedX).attr("x2", updatedX);
-      line3.attr("x1",updatedX).attr("x2", updatedX);
-      line4.attr("x1",updatedX).attr("x2", updatedX);
+      line2.attr("x1", updatedX).attr("x2", updatedX);
+      line3.attr("x1", updatedX).attr("x2", updatedX);
+      line4.attr("x1", updatedX).attr("x2", updatedX);
 
 
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert((updatedX - this.svgMargin) / (parseFloat(svg.style("width")) - (this.svgMargin * 2)) * 100));
@@ -510,9 +511,9 @@ export class SurgerylistComponent implements OnInit {
       //console.log(newX)
       line.attr("x1", newX < this.svgMargin ? this.svgMargin : newX > svgWidth - this.svgMargin ? svgWidth - this.svgMargin : newX).attr("x2", newX < this.svgMargin ? this.svgMargin : newX > svgWidth - this.svgMargin ? svgWidth - this.svgMargin : newX);
       var updatedX = parseFloat(line.attr("x1"))
-      line2.attr("x1",updatedX).attr("x2", updatedX);
-      line3.attr("x1",updatedX).attr("x2", updatedX);
-      line4.attr("x1",updatedX).attr("x2", updatedX);
+      line2.attr("x1", updatedX).attr("x2", updatedX);
+      line3.attr("x1", updatedX).attr("x2", updatedX);
+      line4.attr("x1", updatedX).attr("x2", updatedX);
 
       imgTip.style("left", (updatedX - 10) + "px")
 

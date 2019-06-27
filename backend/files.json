@@ -10,20 +10,10 @@
         "Rektum7",
         "Rektum8"
     ],
-    "csvLocation": "C:/Users/Georgii/Documents/IMB6/CAS/ProjectIII_Material_ohneVideos",
+    "csvLocation": "Path to the folder containing csv files (Example: C:/Users/[Username]/Documents/ProjectIII_Material_ohneVideos)",
     "mediaContent": {
-        "videoData": [
-            "C:/Users/Georgii/Downloads/Prokto6.avi",
-            "C:/Users/Georgii/Downloads/Prokto7.avi",
-            "C:/Users/Georgii/Downloads/Prokto8.avi",
-            "C:/Users/Georgii/Downloads/Sigma6.avi",
-            "C:/Users/Georgii/Downloads/Sigma7.avi",
-            "C:/Users/Georgii/Downloads/Sigma8.avi",
-            "C:/Users/Georgii/Downloads/Rektum6.avi",
-            "C:/Users/Georgii/Downloads/Rektum7.avi",
-            "C:/Users/Georgii/Downloads/Rektum8.avi"
-        ],
-        "output": "C:/Users/Georgii/Desktop/frames",
+        "videoData": "Path to the folder containing video files (Example: C:/Users/[Username]/Downloads)",
+        "output": "Path to the folder where frames will be/are stored (Example: C:/Users/[Username]/Desktop/Frames)",
         "rate": 500
     }
 }

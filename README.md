@@ -9,16 +9,16 @@
 
 ## Setting up the project
 
-### Install dependecies
+### Install dependencies
 
-1. `npm install`
-2. `cd backend`
-3. `npm install`
+1. Install frontend dependencies with `npm install`
+2. Navigate to backend folder `cd backend`
+3. Install backend dependencies with`npm install`
 
 ### Define file locations
 
 1. Open `backend/files.json` file
-2. Define file locations
+2. Define file locations (fields `csvLocation`, `mediaContent.videoData`, `mediaContent.output`)
 
 ### Extract frames
 

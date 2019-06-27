@@ -22,7 +22,7 @@ if not os.path.exists(outputFolder):
     os.mkdir(outputFolder)
     print("Directory %s created" % outputFolder)
     
-for i in videoArr['mediaContent']['videoData']:
+for i in videoArr['surgeryList']:
     videoName = re.search('(Prokto|Sigma|Rektum){1}[6-8]{1}', i).group()
     
     print('########## Loading %s ##########' % videoName)
@@ -36,8 +36,8 @@ for i in videoArr['mediaContent']['videoData']:
         surgeryType = 'Rectal resection'
         
     print('Type: %s' % surgeryType)
-
-    cap = cv2.VideoCapture(i)
+    
+    cap = cv2.VideoCapture(videoArr['mediaContent']['videoData'] + "/" + i + ".avi")
     
     numFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) + 1)
     print('Number of frames: %d' % numFrames)

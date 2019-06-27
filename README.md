@@ -26,7 +26,8 @@
 
 ## Running the application
 
-1. Start the angular application with `npm start`
-2. Navigate to backend folder `cd backend`
-3. Start the node server with `npm start`
-4. Navigate to `http://localhost:4200/`
+1. Navigate to backend folder `cd backend`
+2. Start the node server with `npm start`
+3. Navigate back to project root folder `cd ..`
+4. Start the angular application with `npm start`
+5. Navigate to `http://localhost:4200/`

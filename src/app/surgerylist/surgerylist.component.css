@@ -4,11 +4,6 @@
     transition-timing-function: ease-in-out;
 }
 
-.surgery-name {
-    user-select: none;
-    cursor: pointer;
-}
-
 ::ng-deep div.ttip {
     position: absolute;
     text-align: center;

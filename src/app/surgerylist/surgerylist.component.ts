@@ -83,11 +83,9 @@ export class SurgerylistComponent implements OnInit {
       }
     }
 
-    //console.log("THE RESULT FOR", surgeryName, result)
 
     var sum = 0
     result.map(d => sum += d.count)
-    //console.log("SUM: " + sum)
     var scaleFunc = d3.scaleLinear().domain([0, sum]).range([0, 100]);
 
     this.scaleFunctions.push(new Scale(surgeryName, scaleFunc));
@@ -387,7 +385,6 @@ export class SurgerylistComponent implements OnInit {
       .style("height", "54px")
     var details = imgFrame.append("div")
     var frameField = details.append("div").html("Frame: 0").style("display", "inline-block");
-    //var phaseField = details.append("div").html("Phase: 0").style("display", "inline-block").style("padding-left", "20px");
 
     var svg = d3.select('#' + surgeryName)  // find the right svg
     var svgWidth = parseFloat(svg.style("width"));
@@ -471,9 +468,6 @@ export class SurgerylistComponent implements OnInit {
     var line3 = svg3.append("line").attr("x1", this.svgMargin).attr("y1", -10).attr("x2", this.svgMargin).attr("y2", 180).attr("stroke-width", "1px").attr("stroke", "dimgray");
     var line4 = svg4.append("line").attr("x1", this.svgMargin).attr("y1", -10).attr("x2", this.svgMargin).attr("y2", 180).attr("stroke-width", "1px").attr("stroke", "dimgray");
 
-
-
-
     var updateImage = (frameNr) => {
       img.attr("src", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=" + frameNr)
     }
@@ -491,7 +485,6 @@ export class SurgerylistComponent implements OnInit {
 
 
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert((updatedX - this.svgMargin) / (parseFloat(svg.style("width")) - (this.svgMargin * 2)) * 100));
-      //console.log("NEW FRAME " + frameNr)
 
       imgTip.style("left", (updatedX - 10) + "px")
 
@@ -508,7 +501,7 @@ export class SurgerylistComponent implements OnInit {
     var click = () => {
       var svgWidth = parseFloat(svg.style("width"));
       var newX = d3.mouse(svg.node())[0];
-      //console.log(newX)
+
       line.attr("x1", newX < this.svgMargin ? this.svgMargin : newX > svgWidth - this.svgMargin ? svgWidth - this.svgMargin : newX).attr("x2", newX < this.svgMargin ? this.svgMargin : newX > svgWidth - this.svgMargin ? svgWidth - this.svgMargin : newX);
       var updatedX = parseFloat(line.attr("x1"))
       line2.attr("x1", updatedX).attr("x2", updatedX);
@@ -552,14 +545,12 @@ export class SurgerylistComponent implements OnInit {
     var sum = 0
     nested.map(d => sum += nested.value)
 
-    console.log(nested)
-    nested.sort((a, b) => a.key - b.key)
+    //nested = nested.sort((a, b) => a.value - b.value)
 
     var display = (data) => {
 
       for (var i = 0; i < 14; i++) {
         var foundObj = data.find((d => d.key == i));
-        console.log(foundObj)
         if (foundObj !== undefined) {
           var dur = foundObj.value / 25;
           var hours = Math.floor(dur / 3600);
@@ -587,7 +578,6 @@ export class SurgerylistComponent implements OnInit {
 
   public checkedEvent(event: any, surgeryName: string, graph: string) {
     if (!event.currentTarget.checked) {
-      console.log("DELETING" + " #path-" + graph + "-" + surgeryName)
       d3.select("#path-" + graph + "-" + surgeryName).remove()
     } else {
       this.drawDeviceGraph(surgeryName, graph)
@@ -598,8 +588,10 @@ export class SurgerylistComponent implements OnInit {
     var index = this.surgeryList.findIndex(d => d.name == id);
     if (this.surgeryList[index].collapsed) {
       d3.select("#expand-" + id).style("display", "")
+      d3.select("#btn-" + id).text("Close");
       this.surgeryList[index].collapsed = false;
     } else {
+      d3.select("#btn-" + id).text("Details");
       d3.select("#expand-" + id).style("display", "none");
       this.surgeryList[index].collapsed = true;
 

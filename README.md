@@ -1,33 +1,32 @@
 # EndoVisWorkflow
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
+## Required frameworks
 
-## Running program
-1. Define file locations in `files.json`
-2. `npm start`
-3. `cd backend`
-4. `npm start`
+- Node.js 8.11.1
+- Angular CLI 1.7.4
+- Python 3.7.3
+- OpenCV 3.4.1
 
-## Development server
+## Setting up the project
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+### Install dependecies
 
-## Code scaffolding
+1. `npm install`
+2. `cd backend`
+3. `npm install`
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Define file locations
 
-## Build
+1. Open `backend/files.json` file
+2. Define file locations
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+### Extract frames
 
-## Running unit tests
+1. Run python script `scripts/extract_frames.py`
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Running the application
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+1. Start the angular application with `npm start`
+2. Navigate to backend folder `cd backend`
+3. Start the node server with `npm start`
+4. Navigate to `http://localhost:4200/`

@@ -3,8 +3,7 @@
     <div class="card-body p-0" attr.id="card-{{ surgery.name }}">
       <div style="padding-left: 30px; padding-right: 30px">
         <div style="padding-top: 30px; padding-bottom: 30px">
-          <h5 class="card-title"><span class="surgery-name" (click)="collapseDiv(surgery.name)">{{surgery.name}}</span>
-            <span class="badge badge-info">{{surgery.type}}</span></h5>
+          <h5 class="card-title">{{surgery.name}} <span class="badge badge-info">{{surgery.type}}</span></h5>
           <h6 class="card-subtitle mb-2 text-muted">{{surgery.h}}:{{surgery.m}}:{{surgery.s}}</h6>
           <div *ngIf="surgery.loading" class="spinner-border text-primary"
             style="width: 40px; height: 40px; position: absolute; left:50%; top: 178.6px" role="status">
@@ -184,6 +183,11 @@
           </table>
         </div>
 
+      </div>
+
+      <div style="padding-left: 30px; padding-right: 30px; margin-top: 30px; margin-bottom: 20px">
+        <button attr.id="btn-{{ surgery.name }}" type="button" class="btn btn-primary btn-sm"
+          (click)="collapseDiv(surgery.name)">Details</button>
       </div>
 
     </div>

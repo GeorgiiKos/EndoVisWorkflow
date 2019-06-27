@@ -13,7 +13,7 @@
 
 1. Install frontend dependencies with `npm install`
 2. Navigate to backend folder `cd backend`
-3. Install backend dependencies with`npm install`
+3. Install backend dependencies with `npm install`
 
 ### Define file locations
 

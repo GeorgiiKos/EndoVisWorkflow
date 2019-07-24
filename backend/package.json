@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "csv-parser": "^2.2.0",
-    "express": "^4.16.4"
+    "csv-parser": "^2.3.0",
+    "express": "^4.17.1"
   }
 }

@@ -9,6 +9,8 @@ import { DeviceDataUnit } from '../models/deviceDataUnit';
 import { Phase } from '../models/phase';
 import { Surgery } from '../models/surgery';
 import { SurgeryPhases } from '../models/surgeryPhases';
+import { InstrumentAnnotation } from '../models/instrumentAnnotation';
+import { InstrumentUnit } from '../models/instrumentUnit';
 
 @Injectable()
 export class DataService {
@@ -48,6 +50,23 @@ export class DataService {
           .map(e => new DeviceDataUnit(e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12], e[13], e[14]))
 
         return new DeviceData(surgeryName, data);
+      }))
+  }
+
+  public getInstumentArray(surgeryName: string): Observable<InstrumentAnnotation> {
+    const url = `http://localhost:4200/api/getInstrumentArray?surgeryName=${surgeryName}`
+    return this.http.get(url, { responseType: "text" }).pipe(
+      map(response => {
+        var data = response
+          .toString() // convert Buffer to string
+          .replace("Frame,Grasper,HarmonicScalpel,J-hook,Ligasure,Scissors,Stapler,Aspirator,Swapholder,SiliconeDrain,Clipper,I-Hook,NeedleHolder", "")
+          .trim()
+          .split('\n') // split string to lines
+          .map(e => e.trim()) // remove white spaces for each line
+          .map(e => e.split(',').map(e => e.trim()))
+          .map(e => new InstrumentUnit(e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12]))
+
+        return new InstrumentAnnotation(surgeryName, data);
       }))
   }
 }

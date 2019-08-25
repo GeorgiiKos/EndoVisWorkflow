@@ -9,6 +9,8 @@ import { Scale } from '../models/scale';
 import { DeviceData } from '../models/DeviceData';
 import { DeviceDataUnit } from '../models/deviceDataUnit';
 import { PhaseCount } from '../models/phaseCount';
+import { InstrumentAnnotation } from '../models/instrumentAnnotation';
+import colors from "../../colors.json";
 
 @Component({
   selector: 'app-surgerylist',
@@ -24,6 +26,8 @@ export class SurgerylistComponent implements OnInit {
   scaleFunctions: Scale[] = []
 
   deviceData: DeviceData[] = []
+
+  instrumentData: InstrumentAnnotation[] = []
 
   // Positioning variables
   svgMargin = 30;
@@ -43,6 +47,7 @@ export class SurgerylistComponent implements OnInit {
           this.surgeryList[i].loading = true
           this.surgeryList[i].collapsed = true
           this.loadSurgeryPhases(this.surgeryList[i].name)
+          this.loadInstruments(this.surgeryList[i].name)
         }
       })
   }
@@ -63,6 +68,14 @@ export class SurgerylistComponent implements OnInit {
         this.deviceData.push(response);
         this.drawDeviceAxes(surgeryName)
         this.drawDeviceGraph(surgeryName, "thermoCurrGasFlow");
+      })
+  }
+
+  public loadInstruments(surgeryName: string) {
+    this.dataService.getInstumentArray(surgeryName)
+      .subscribe(response => {
+        this.instrumentData.push(response);
+        this.drawInstrumentGraph(surgeryName)
       })
   }
 
@@ -190,7 +203,8 @@ export class SurgerylistComponent implements OnInit {
     var length = this.deviceData[index].data.length;
     var svgWidth = parseFloat(d3.select('#' + surgeryName).style("width")) - (this.svgMargin * 2);
 
-    var binnedData = this.createBinsMiddle(this.deviceData[index].data)
+    var binnedData = this.createBinsAverage(this.deviceData[index].data, graph)
+    //var binnedData = this.deviceData[index].data
 
     //var min = d3.min(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
     //var max = d3.max(this.deviceData[index].data, (d) => Number(d.thermoCurrGasFlow));
@@ -307,16 +321,16 @@ export class SurgerylistComponent implements OnInit {
     }
   }
 
-  public createBinsMiddle(arr: DeviceDataUnit[]) {
+  public createBinsAverage(arr: DeviceDataUnit[], graph: string) {
     var nrBins = 150;
     var sum = 0;
     var firstPosition = 0;
     var newArr: DeviceDataUnit[] = []
     for (var i in arr) {
-      sum += Number(arr[i].thermoCurrGasFlow);
+      sum += Number(arr[i][graph]);
       if (Number(i) - nrBins + 1 == firstPosition && Number(i) != 0) {
         var newUnit = arr[i];
-        newUnit.thermoCurrGasFlow = sum / nrBins;
+        newUnit[graph] = sum / nrBins;
         newUnit.frame = firstPosition;
         newArr.push(newUnit);
         sum = 0;
@@ -434,7 +448,7 @@ export class SurgerylistComponent implements OnInit {
             case 3:
               return "#5b009c"
             case 4:
-              return "#0000ff"
+              return "#f9a700"
             case 5:
               return "#259f9f"
             case 6:
@@ -444,7 +458,7 @@ export class SurgerylistComponent implements OnInit {
             case 8:
               return "#ffff00"
             case 9:
-              return "#f9a700"
+              return "#0000ff"
             case 10:
               return "#f76c00"
             case 11:
@@ -464,9 +478,12 @@ export class SurgerylistComponent implements OnInit {
     var svg2 = d3.select('#graph1-' + surgeryName + "-svg")
     var svg3 = d3.select('#graph2-' + surgeryName + "-svg")
     var svg4 = d3.select('#graph3-' + surgeryName + "-svg")
+    var svg5 = d3.select('#graph4-' + surgeryName + "-svg")
     var line2 = svg2.append("line").attr("x1", this.svgMargin).attr("y1", -10).attr("x2", this.svgMargin).attr("y2", 180).attr("stroke-width", "1px").attr("stroke", "dimgray");
     var line3 = svg3.append("line").attr("x1", this.svgMargin).attr("y1", -10).attr("x2", this.svgMargin).attr("y2", 180).attr("stroke-width", "1px").attr("stroke", "dimgray");
     var line4 = svg4.append("line").attr("x1", this.svgMargin).attr("y1", -10).attr("x2", this.svgMargin).attr("y2", 180).attr("stroke-width", "1px").attr("stroke", "dimgray");
+    var line5 = svg5.append("line").attr("x1", this.svgMargin).attr("y1", -10).attr("x2", this.svgMargin).attr("y2", 180).attr("stroke-width", "1px").attr("stroke", "dimgray");
+
 
     var updateImage = (frameNr) => {
       img.attr("src", "http://localhost:8000/api/getImage?surgeryName=" + surgeryName + "&frame=" + frameNr)
@@ -482,6 +499,7 @@ export class SurgerylistComponent implements OnInit {
       line2.attr("x1", updatedX).attr("x2", updatedX);
       line3.attr("x1", updatedX).attr("x2", updatedX);
       line4.attr("x1", updatedX).attr("x2", updatedX);
+      line5.attr("x1", updatedX).attr("x2", updatedX);
 
 
       var frameNr = Math.round(this.scaleFunctions.find(d => d.surgeryName == surgeryName).scale.invert((updatedX - this.svgMargin) / (parseFloat(svg.style("width")) - (this.svgMargin * 2)) * 100));
@@ -507,6 +525,7 @@ export class SurgerylistComponent implements OnInit {
       line2.attr("x1", updatedX).attr("x2", updatedX);
       line3.attr("x1", updatedX).attr("x2", updatedX);
       line4.attr("x1", updatedX).attr("x2", updatedX);
+      line5.attr("x1", updatedX).attr("x2", updatedX);
 
       imgTip.style("left", (updatedX - 10) + "px")
 
@@ -525,6 +544,7 @@ export class SurgerylistComponent implements OnInit {
     svg2.on("click", click)
     svg3.on("click", click)
     svg4.on("click", click)
+    svg5.on("click", click)
 
 
     line.call(d3.drag().on("drag", drag))
@@ -595,6 +615,175 @@ export class SurgerylistComponent implements OnInit {
       d3.select("#expand-" + id).style("display", "none");
       this.surgeryList[index].collapsed = true;
 
+    }
+  }
+
+  public drawInstrumentGraph(surgeryName: string) {
+
+    var tmp = [
+      "Grasper",
+      "Harmonic Scalpel",
+      "J-hook",
+      "Ligasure",
+      "Scissors",
+      "Stapler",
+      "Aspirator",
+      "Swapholder",
+      "Silicone Drain",
+      "Clipper",
+      "I-Hook",
+      "Needle Holder"
+    ]
+
+
+    var svg = d3.select('#graph4-' + surgeryName).attr("transform", "translate(0, 10)")
+    var index = this.surgeryList.findIndex(d => d.name == surgeryName);
+    var length = this.surgeryList[index].numFrames;
+    var svgWidth = parseFloat(d3.select('#' + surgeryName).style("width")) - (this.svgMargin * 2);
+
+    var scaleFuncX = d3.scaleLinear().domain([0, length]).range([0, svgWidth]);
+    var scaleFuncY = d3.scaleBand().domain(tmp).range([150, 0])
+
+    var instruments = this.instrumentData.find(d => d.name == surgeryName).data;
+
+
+    // Call the x axis in a group tag
+    svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(" + this.svgMargin + ", 150)")
+      .call(d3.axisBottom(scaleFuncX)); // Create an axis component with d3.axisBottom
+
+    svg.append("g")
+      .attr("class", "y-axis")
+      .attr("transform", "translate(" + this.svgMargin + " ,0)")
+      .call(d3.axisLeft(scaleFuncY)); // Create an axis component with d3.axisLeft
+
+    svg.selectAll(".y-axis .tick:not(:first-child) text").attr("x", -25).style('text-anchor', 'start');
+    svg.select(".y-axis .domain").remove();
+    svg.selectAll(".y-axis .tick line").remove(); // temporary solution
+
+
+    for (let i in instruments) {
+      if (instruments[i].grasper == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Grasper"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color1);
+      }
+      if (instruments[i].harmonicScalpel == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Harmonic Scalpel"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color2);
+      }
+      if (instruments[i].j_hook == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("J-hook"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color3);
+      }
+      if (instruments[i].ligasure == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Ligasure"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color4);
+      }
+      if (instruments[i].scissors == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Scissors"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color5);
+      }
+      if (instruments[i].stapler == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Stapler"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color6);
+      }
+      if (instruments[i].aspirator == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Aspirator"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color7);
+      }
+      if (instruments[i].swapholder == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Swapholder"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color8);
+      }
+      if (instruments[i].siliconeDrain == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Silicone Drain"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color9);
+      }
+      if (instruments[i].clipper == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("Clipper"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color10);
+      }
+      if (instruments[i].i_hook == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("I-Hook"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color11);
+      }
+      if (instruments[i].needleHolder == 1) {
+        svg.append("rect")
+          .attr("transform", "translate(" + this.svgMargin + " ,0)")
+          .attr("class", "bar")
+          .attr("x", function (d) { return scaleFuncX(instruments[i].frame); })
+          .attr("width", function (d) { return scaleFuncX(1500); })
+          .attr("y", function (d) { return scaleFuncY("NeedleHolder"); })
+          .attr("height", scaleFuncY.bandwidth())
+          .attr("fill", colors.color12);
+      }
     }
   }
 

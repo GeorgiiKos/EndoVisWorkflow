@@ -787,4 +787,29 @@ export class SurgerylistComponent implements OnInit {
     }
   }
 
+  public sortSurgeries(name: string, asc: boolean) {
+    if (name == "duration") {
+      this.surgeryList.sort((a, b) => {
+        var date1 = new Date("1970-01-01T" + a.h + ":" + a.m + ":" + a.s + "Z")
+        var date2 = new Date("1970-01-01T" + b.h + ":" + b.m + ":" + b.s + "Z")
+        if (asc) {
+          return date1 < date2 ? -1 :
+            (date1 > date2 ? 1 : 0);
+        } else {
+          return date1 < date2 ? 1 :
+            (date1 > date2 ? -1 : 0);
+        }
+      })
+    } else if (name == "name") {
+      this.surgeryList.sort((a, b) => {
+        if (asc) {
+          return a.name < b.name ? -1 :
+            (a.name > b.name ? 1 : 0);
+        } else {
+          return a.name < b.name ? 1 :
+            (a.name > b.name ? -1 : 0);
+        }
+      })
+    }
+  }
 }

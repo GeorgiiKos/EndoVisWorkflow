@@ -2,9 +2,9 @@
 
 ## Required frameworks
 
-- Node.js 8.11.1
-- Angular CLI 1.7.4
-- Python 3.7.3
+- Node.js 10.16.0
+- Angular CLI 8.3.25
+- Python 3.7.4
 - OpenCV 3.4.1
 
 ## Setting up the project
@@ -26,8 +26,8 @@
 
 ## Running the application
 
-1. Navigate to backend folder `cd backend`
+1. Navigate to the backend folder `cd backend`
 2. Start the node server with `npm start`
-3. Navigate back to project root folder `cd ..`
+3. Open new terminal tab
 4. Start the angular application with `npm start`
 5. Navigate to `http://localhost:4200/`

@@ -1,16 +1,12 @@
 const express = require('express')
-const app = express()
+const path = require('path')
 
-// server port
+const app = express()
+const config = require('./config')
 const port = 8000
 
-// api module
-const api = require('./api')
-app.use('/api', api)
-
-// serve static html files (for production use)
-const path = require('path')
-app.use(express.static(path.join(__dirname, '../dist')))
+app.use(express.static(path.join(__dirname, '../dist')))  // serve static html files (for production use)
+app.use('/data', express.static(config.csvLocation))  // serve csv files
 
 // start server
 app.listen(port, () => {

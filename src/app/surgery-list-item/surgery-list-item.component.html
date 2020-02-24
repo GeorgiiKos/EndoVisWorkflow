@@ -1,0 +1,19 @@
+<div class="card my-2">
+    <div class="card-body">
+        <h5 class="card-title">{{videoMetadata.name}}
+            <span class="badge badge-primary">{{videoMetadata.type}}</span>
+        </h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{duration}}</h6>
+
+        <!-- <app-bar-chart [name]="surgery.name"></app-bar-chart> -->
+
+        <!-- <app-line-chart [data]="data1"></app-line-chart>
+        <app-line-chart [data]="data2"></app-line-chart>
+        <app-line-chart [data]="data3"></app-line-chart> -->
+
+        <app-chart-area *ngIf="videoMetadata && phaseAnnotation && deviceData && instrumentAnnotation" [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation" [deviceData]="deviceData" [instrumentAnnotation]="instrumentAnnotation"></app-chart-area>
+
+        <!-- <app-timeline-chart [surgery]="surgery"></app-timeline-chart> -->
+        <app-table *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation"></app-table>
+    </div>
+</div>

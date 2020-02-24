@@ -61,15 +61,8 @@ for path in video_files:
     print('FPS: %d' % fps)
     
     # calculate video duration
-    duration_sec = num_frames / fps
-    h = int(duration_sec / 3600)
-    h = h if h > 10 else '0%d' % h
-    m = int((duration_sec / 60) % 60)
-    m = m if m > 10 else '0%d' % m
-    s = int(duration_sec % 60)
-    s = s if s > 10 else '0%d' % s
-    duration = '{}:{}:{}'.format(h, m, s)
-    print('Video duration: {}'.format(duration_sec))
+    duration = int((num_frames / fps) * 1000)
+    print('Video duration: {}'.format(duration))
     
     # get frame width and height
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))

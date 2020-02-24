@@ -1,10 +1,10 @@
 {
-  "name": "endvisworkflow",
-  "version": "0.0.0",
+  "name": "endo-vis-workflow",
+  "version": "0.3.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --proxy-config proxy.config.json",
+    "start": "ng serve --open --proxy-config proxy.config.json",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",

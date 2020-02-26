@@ -19,7 +19,7 @@ export class TableComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.drawTable()
+    this.drawTable();
   }
 
   private drawTable() {
@@ -35,24 +35,26 @@ export class TableComponent implements OnInit {
     var tbody = table.append('tbody');
 
     // append the header row
-    thead.append('tr')
+    thead = thead.append('tr')
       .selectAll('th')
       .data(columns)
       .enter()
       .append('th')
       .text((column) => column)
+      .attr('class', 'header')
+      .attr('class', (d, i) => d === 'Phase' ? 'asc' : '')  // display arrow
       .on('click', function (d) {  // sort table
-        thead.attr('class', '');  // reset class attribute
+        thead.attr('class', 'header')  // remove classes
+        thead.classed('des', false);
         if (sortAscending) {
           rows.sort(function (a, b) { return ascending(a[d], b[d]); });
           sortAscending = false;
-          this.className = 'sortDown';
+          this.className = 'asc';
         } else {
           rows.sort(function (a, b) { return descending(a[d], b[d]); });
           sortAscending = true;
-          this.className = 'sortUp';
+          this.className = 'desc';
         }
-        console.log(rows)
       });
 
     // create a row for each object in the data

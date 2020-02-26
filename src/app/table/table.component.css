@@ -1,0 +1,32 @@
+::ng-deep th.desc:after {
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: 0;
+    content: "";
+    border-top: .3em solid gray;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
+}
+  
+::ng-deep th.asc:after {
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: 0;
+    border-right: .3em solid transparent;
+    border-bottom: .3em solid gray;
+    border-left: .3em solid transparent;
+}
+
+::ng-deep th.header:after {
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: .3em solid transparent;
+    border-right: .3em solid transparent;
+    border-bottom: .3em solid transparent;
+    border-left: .3em solid transparent;
+}

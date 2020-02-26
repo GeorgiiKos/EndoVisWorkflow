@@ -1,19 +1,36 @@
 <div class="card my-2">
     <div class="card-body">
-        <h5 class="card-title">{{videoMetadata.name}}
-            <span class="badge badge-primary">{{videoMetadata.type}}</span>
-        </h5>
+        <div class="d-flex align-items-center">
+            <h5 class="card-title mr-auto">{{videoMetadata.name}}
+                <span class="badge badge-primary">{{videoMetadata.type}}</span>
+            </h5>
+            <button type="button" (click)="expandCard()" class="btn btn-primary btn-sm"
+                [disabled]="cardExpanded && (!videoMetadata || !phaseAnnotation || !deviceData || !instrumentAnnotation)">
+                <span *ngIf="!cardExpanded">
+                    Details
+                </span>
+                <span
+                    *ngIf="cardExpanded && (!videoMetadata || !phaseAnnotation || !deviceData || !instrumentAnnotation)">
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    Loading...
+                </span>
+                <span *ngIf="cardExpanded && videoMetadata && phaseAnnotation && deviceData && instrumentAnnotation">
+                    Close
+                </span>
+            </button>
+        </div>
         <h6 class="card-subtitle mb-2 text-muted">{{duration}}</h6>
 
-        <!-- <app-bar-chart [name]="surgery.name"></app-bar-chart> -->
 
-        <!-- <app-line-chart [data]="data1"></app-line-chart>
-        <app-line-chart [data]="data2"></app-line-chart>
-        <app-line-chart [data]="data3"></app-line-chart> -->
+        <div *ngIf="!phaseAnnotation" class="d-flex justify-content-center" style="width:100%; height: 35px">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
 
-        <app-chart-area *ngIf="videoMetadata && phaseAnnotation && deviceData && instrumentAnnotation" [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation" [deviceData]="deviceData" [instrumentAnnotation]="instrumentAnnotation"></app-chart-area>
-
-        <!-- <app-timeline-chart [surgery]="surgery"></app-timeline-chart> -->
-        <app-table *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation"></app-table>
+        <app-chart-area *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata"
+            [phaseAnnotation]="phaseAnnotation" [deviceData]="deviceData" [instrumentAnnotation]="instrumentAnnotation">
+            <!-- to display the component at least videoMetadata and phaseAnnotation must be present-->
+        </app-chart-area>
     </div>
 </div>

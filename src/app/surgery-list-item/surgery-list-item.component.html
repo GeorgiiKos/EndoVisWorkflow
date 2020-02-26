@@ -28,9 +28,12 @@
             </div>
         </div>
 
+        <app-bar-chart *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata"
+            [phaseAnnotation]="phaseAnnotation"></app-bar-chart>
+
         <app-chart-area *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata"
             [phaseAnnotation]="phaseAnnotation" [deviceData]="deviceData" [instrumentAnnotation]="instrumentAnnotation">
-            <!-- to display the component at least videoMetadata and phaseAnnotation must be present-->
+        <!-- to display the component at least videoMetadata and phaseAnnotation must be present-->
         </app-chart-area>
     </div>
 </div>

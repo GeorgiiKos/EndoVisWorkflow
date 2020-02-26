@@ -11,9 +11,9 @@ import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 export class ChartAreaComponent implements OnInit {
 
   @Input() videoMetadata;
-  @Input() phaseAnnotation;
   @Input() deviceData;
   @Input() instrumentAnnotation;
+  @Input() phaseAnnotation;
 
 
   public dataLoaded = false;
@@ -37,6 +37,8 @@ export class ChartAreaComponent implements OnInit {
   private innerWidth;
   private innerHeight;
 
+  private commonGroup;
+
 
   constructor() { }
 
@@ -50,6 +52,7 @@ export class ChartAreaComponent implements OnInit {
       this.svgElement.attr('height', this.barHeight + this.graphHeight * 4)
       this.drawDeviceDataGraph();
       this.drawInstrumentAnnotationGraph();
+      this.drawPointer();
     }
   }
 
@@ -60,8 +63,10 @@ export class ChartAreaComponent implements OnInit {
     this.innerWidth = this.svgWidth - this.margin.left - this.margin.right;
     this.innerHeight = this.graphHeight - this.margin.top - this.margin.bottom;
 
+    this.commonGroup = this.svgElement.append('g').attr('transform', `translate(${this.margin.left}, 0)`)
 
-    this.drawPhaseBar();
+
+    // this.drawPhaseBar();
   }
 
   private drawInstrumentAnnotationGraph() {
@@ -74,8 +79,8 @@ export class ChartAreaComponent implements OnInit {
       .range(["#ff58ab", "#3c5b16", "#5e38b4", "#ff5a09", "#0191bb", "#ff5556", "#91d4ba", "#cd0071", "#ffb555", "#c3baff", "#784543", "#ffabc0"])
 
     // create group for the graph and move it 
-    var group = this.svgElement.append('g')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top + this.graphHeight * 3 + this.barHeight})`)
+    var group = this.commonGroup.append('g')
+      .attr('transform', `translate(0, ${this.margin.top + this.graphHeight * 3 + this.barHeight})`)
       .attr('class', `content-${this.videoMetadata.name}`);
 
     // add x-axis
@@ -137,8 +142,8 @@ export class ChartAreaComponent implements OnInit {
   }
 
   private drawSingleDeviceDataGraph(i, range, headers, colorScale) {
-    var group = this.svgElement.append('g')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top + this.graphHeight * i + this.barHeight})`)
+    var group = this.commonGroup.append('g')
+      .attr('transform', `translate(0, ${this.margin.top + this.graphHeight * i + this.barHeight})`)
       .attr('class', `content-${this.videoMetadata.name}`);
     var xScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
     var yScale = scaleLinear().domain(range).range([this.innerHeight, 0])
@@ -177,49 +182,7 @@ export class ChartAreaComponent implements OnInit {
       .style('mix-blend-mode', 'multiply');
   }
 
-  private drawPhaseBar() {
 
-    this.svgElement.attr('height', this.barHeight + 70)
-    // get scales
-    var xScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
-    var yScale = scaleBand().domain(['Phase']).range([this.barHeight, 0]);
-    var colorScale = scaleOrdinal().domain(range(14))
-      .range(["#cd5981", "#743b32", "#d24d32", "#c6893f", "#ccb998", "#ccd14e", "#5e7b3b", "#72d263", "#3f4e48", "#76c9bb", "#9697c9", "#6749c1", "#4d2f61", "#c851c5"])
-
-    // create group for the graph and move it 
-    var group = this.svgElement.append('g').attr('transform', `translate(${this.margin.left}, 0)`);
-
-    var transformedData = this.transformPhaseAnnotation();
-
-    // Define the div for the tooltip
-    var div = group.append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
-
-    // add bar
-    group.append('g').selectAll('rect')
-      .data(transformedData)
-      .enter().append('rect')
-      .attr('x', function (d) { return xScale(d.from); })
-      .attr('y', 70)
-      .attr('width', function (d) { return xScale(d.to - d.from); })
-      .attr('fill', function (d) { return colorScale(d.phase); })
-      .attr('height', yScale.bandwidth())
-      .on("mouseover", function (d) {
-        select(this)
-          .style("opacity", .7);
-        div.transition()
-          .duration(200)
-          .style("opacity", .9);
-        div.html(d.phase)
-          .style("left", event.pageX)
-          .style("top", event.pageY);
-      })
-      .on("mouseout", function (d) {
-        select(this).transition().duration(300)
-          .style("opacity", 1);
-      });
-  }
 
   // TODO: maybe it is possible to do it with d3?
   private transformInstrumentAnnotation(data) {
@@ -240,27 +203,6 @@ export class ChartAreaComponent implements OnInit {
       }
     }
     return result
-  }
-
-  // TODO: maybe it is possible to do it with d3?
-  public transformPhaseAnnotation() {
-    var currentPhase = this.phaseAnnotation[0].phase;
-    var from = 0;
-    var to = 0;
-    var result = []
-    for (var row of this.phaseAnnotation) {
-      if (row.phase !== currentPhase) {
-        result.push({ phase: currentPhase, from: from, to: to });
-        currentPhase = row.phase;
-        from = row.frame;
-      } else if (row.frame == this.phaseAnnotation.length - 1) {  // last frame
-        to = row.frame;
-        result.push({ phase: currentPhase, from: from, to: to });
-      } else {
-        to = row.frame;
-      }
-    }
-    return result;
   }
 
   // mean downsampling
@@ -298,6 +240,17 @@ export class ChartAreaComponent implements OnInit {
   public hideContent() {
     selectAll(`.content-${this.videoMetadata.name}`).style('display', 'none')
     this.svgElement.attr("height", this.barHeight);
+  }
+
+  private drawPointer() {
+    var pointer = this.commonGroup.append('line')
+      .attr('class', `pointer-${this.videoMetadata.name}`)
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", this.svgHeight)
+      .attr("stroke-width", "3")
+      .attr("stroke", "dimgray");
   }
 
 }

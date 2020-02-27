@@ -71,9 +71,9 @@ export class ChartAreaComponent implements OnInit {
     this.chartAreaSvg = select('#chart-area-' + this.videoMetadata.name);
 
     this.barChartGroup = this.barChartSvg.append('g').attr('transform', `translate(${this.marginX.left}, 0)`);
-    this.chartAreaGroup = this.chartAreaSvg.append('g').attr('transform', `translate(${this.marginX.left}, 0)`);
+    // this.chartAreaGroup = this.chartAreaSvg.append('g').attr('transform', `translate(${this.marginX.left}, 0)`);
 
-    this.svgWidth = parseFloat(this.chartAreaSvg.style('width'));
+    this.svgWidth = parseFloat(this.barChartSvg.style('width'));
 
     this.innerWidth = this.svgWidth - this.marginX.left - this.marginX.right;
 
@@ -111,7 +111,7 @@ export class ChartAreaComponent implements OnInit {
           .style("opacity", .7);
       })
       .on("mouseout", function (d) {
-        select(this).transition().duration(300)
+        select(this).transition()
           .style("opacity", 1);
       });
   }
@@ -159,32 +159,36 @@ export class ChartAreaComponent implements OnInit {
       .style('background-color', 'gray')
       .style('border-radius', '.25rem')
 
-    this.image = this.imageFrame.append('img').attr('src', `/data/Frames/${this.videoMetadata.name}/Frame000000.jpg`);
+    this.image = this.imageFrame
+      .append('div')  // additional div with fixed size of a frame
+      .style('width', '96px')
+      .style('height', '54px')
+      .append('img').attr('src', `/data/Frames/${this.videoMetadata.name}/Frame000000.jpg`);
 
     this.imageFrameInfo = this.imageFrame.append('div').style('font-size', '10px')
       .style('height', '15px').html('0 | 00:00:00');
 
     this.imageFrameTip = this.barChartGroup.append('polygon')
       .attr('points', `-10,${this.barChartMarginY.top} 10,${this.barChartMarginY.top} 0,${this.barChartMarginY.top + 20}`)
-      .style('fill', 'dimgray');
+      .style('fill', 'gray');
 
     // add drag behavior for pointer element
-    pointer.call(drag().on('drag', this.dragBehavior));
-    this.imageFrameTip.call(drag().on('drag', this.dragBehavior));
+    pointer.call(drag().on('drag', () => this.dragBehavior(this.videoMetadata.name, this.barChartGroup, this.drawDeviceDataGraph, this.marginX.left, this.barChartMarginY.top)));
+    this.imageFrameTip.call(drag().on('drag', () => this.dragBehavior(this.videoMetadata.name, this.barChartGroup, this.drawDeviceDataGraph, this.marginX.left, this.barChartMarginY.top)));
 
     // add click behavior for svg element
     this.barChartSvg.on('click', this.clickBehavior);
   }
 
-  dragBehavior = () => {
-    var pointers = selectAll(`.pointer-${this.videoMetadata.name}`);
-    var xMouse = mouse(this.barChartGroup.node())[0];  // get x mouse position relative to group element
-    var xUpdated = xMouse < 0 ? 0 : xMouse > this.innerWidth ? this.innerWidth : xMouse;  // check if x doesnt exceed group 
+  dragBehavior = (name, group, width, marginLeft, marginTop) => {
+    var pointers = selectAll(`.pointer-${name}`);
+    var xMouse = mouse(group.node())[0];  // get x mouse position relative to group element
+    var xUpdated = xMouse < 0 ? 0 : xMouse > width ? width : xMouse;  // check if x doesnt exceed group 
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(this.xFramesScale.invert(xUpdated));
     this.image.attr('src', this.getImageUrl(frameNr));  // update image
-    this.imageFrame.style('left', `${this.marginX.left + xUpdated - 48}px`);
-    this.imageFrameTip.attr('points', `${xUpdated - 10},${this.barChartMarginY.top} ${xUpdated + 10},${this.barChartMarginY.top} ${xUpdated},${this.barChartMarginY.top + 20}`)
+    this.imageFrame.style('left', `${marginLeft + xUpdated - 48}px`);
+    this.imageFrameTip.attr('points', `${xUpdated - 10},${marginTop} ${xUpdated + 10},${marginTop} ${xUpdated},${marginTop + 20}`)
     var time = this.xTimeScale.invert(frameNr);
     this.imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
@@ -197,7 +201,6 @@ export class ChartAreaComponent implements OnInit {
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(this.xFramesScale.invert(xUpdated));
     this.image.attr('src', this.getImageUrl(frameNr));  // update image
-    console.log(typeof xUpdated)
     this.imageFrame.style('left', `${this.marginX.left + xUpdated - 48}px`)
     this.imageFrameTip.attr('points', `${xUpdated - 10},${this.barChartMarginY.top} ${xUpdated + 10},${this.barChartMarginY.top} ${xUpdated},${this.barChartMarginY.top + 20}`)
     var time = this.xTimeScale.invert(frameNr);
@@ -388,12 +391,8 @@ export class ChartAreaComponent implements OnInit {
   //     .attr("stroke", "dimgray");
   // }
 
-  private getImageUrl(frameNr) {
-    if (frameNr % 500 > 500 / 2) {  // TODO: read from videoMetadata
-      while (frameNr % 500 != 0) { frameNr++; }
-    } else {
-      while (frameNr % 500 != 0) { frameNr--; }
-    }
+  private getImageUrl(frameNr) {  // TODO: read from videoMetadata
+    while (frameNr % 500 != 0) { frameNr--; }
 
     var frameNrFormat = frameNr.toString().padStart(6, '0');
     return `/data/Frames/${this.videoMetadata.name}/Frame${frameNrFormat}.jpg`;

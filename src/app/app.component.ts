@@ -15,8 +15,4 @@ export class AppComponent {
   public sortMetadata(column: string, asc: boolean) {
     this.child.sortMetadata(column, asc);
   }
-
-  public collapseAll() {
-    this.child.collapseAll();
-  }
 }

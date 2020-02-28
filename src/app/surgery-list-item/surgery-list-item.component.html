@@ -22,18 +22,22 @@
         <h6 class="card-subtitle mb-2 text-muted">{{duration}}</h6>
 
 
-        <div *ngIf="!phaseAnnotation" class="d-flex justify-content-center" style="width:100%; height: 35px">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
+        <div *ngIf="!phaseAnnotation" style="width:100%; height: 110px">
+            <div class="d-flex h-100 align-items-center justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
             </div>
         </div>
 
-        <!-- <app-bar-chart *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata"
-            [phaseAnnotation]="phaseAnnotation"></app-bar-chart> -->
+        <app-bar-chart *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata"
+            [phaseAnnotation]="phaseAnnotation"></app-bar-chart>
 
-        <app-chart-area *ngIf="videoMetadata && phaseAnnotation" [videoMetadata]="videoMetadata"
-            [phaseAnnotation]="phaseAnnotation" [deviceData]="deviceData" [instrumentAnnotation]="instrumentAnnotation">
-        <!-- to display the component at least videoMetadata and phaseAnnotation must be present-->
-        </app-chart-area>
+        <div *ngIf="videoMetadata && deviceData && instrumentAnnotation && phaseAnnotation" [hidden]="!cardExpanded">
+            <app-chart-area [videoMetadata]="videoMetadata" [deviceData]="deviceData"
+                [instrumentAnnotation]="instrumentAnnotation">
+            </app-chart-area>
+            <app-table [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation"></app-table>
+        </div>
     </div>
 </div>

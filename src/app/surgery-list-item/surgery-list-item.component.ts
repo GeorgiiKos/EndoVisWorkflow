@@ -1,19 +1,17 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy, ComponentRef, ChangeDetectorRef } from '@angular/core';
 import { autoType, csvParse, csvParseRows } from 'd3';
 import { DataService } from '../services/data.service';
-import { ChartAreaComponent } from '../chart-area/chart-area.component';
 
 
 @Component({
   selector: 'app-surgery-list-item',
   templateUrl: './surgery-list-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./surgery-list-item.component.css']
 })
 export class SurgeryListItemComponent implements OnInit {
 
   public cardExpanded = false;
-
-  @ViewChild(ChartAreaComponent, {static: false}) child: ChartAreaComponent;
 
   @Input() videoMetadata;
   public duration: string;
@@ -21,7 +19,12 @@ export class SurgeryListItemComponent implements OnInit {
   public deviceData;
   public instrumentAnnotation;
 
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService, private cdr: ChangeDetectorRef) { }
+
+  ngOnChange() {
+    console.log('change')
+
+  }
 
   ngOnInit() {
     this.displayDuration();
@@ -33,6 +36,7 @@ export class SurgeryListItemComponent implements OnInit {
             phase: parseInt(data[1])
           }
         });
+        this.cdr.markForCheck()
       })
   }
 
@@ -57,11 +61,14 @@ export class SurgeryListItemComponent implements OnInit {
           exposureIndex: parseInt(data[14])
         }
       });
+      this.cdr.markForCheck()
     })
 
     this.dataService.getInstrumentAnnotation(this.videoMetadata.name).subscribe(response => {
       this.instrumentAnnotation = csvParse(response, autoType)
+      this.cdr.markForCheck()
     })
+
   }
 
   private displayDuration() {
@@ -78,9 +85,7 @@ export class SurgeryListItemComponent implements OnInit {
       this.loadDeviceDataAndInstrumentAnnotation();
     } else if (!this.cardExpanded) {
       this.cardExpanded = true;
-      this.child.showContent();
     } else {
-      this.child.hideContent();
       this.cardExpanded = false;
     }
   }

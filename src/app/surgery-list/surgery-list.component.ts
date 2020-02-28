@@ -45,11 +45,4 @@ export class SurgeryListComponent implements OnInit {
       }
     }
   }
-
-  public collapseAll() {
-    this.surgeryListItems.forEach((e) => {
-      e.cardExpanded = false;
-      e.child.hideContent()
-    });
-  }
 }

@@ -10,14 +10,19 @@ import os
 import csv
 import glob
 
-regex = '(([A-Z][a-z]+)(\d+))\.avi'
-
 # open configuration file
 with open('../config.json') as json_file:  
     config = json.load(json_file)
-    
+
 # get location to store frames    
 output_folder = config['csvLocation'] + '/Frames'
+
+# get downscale factor
+downscale_factor = config['downscaleFactor']
+
+frame_sampling_rate = config['frameSamplingRate']
+
+regex = '(([A-Z][a-z]+)(\d+))\.avi'
 
 # get sorted list of video files
 video_files = glob.glob(config['videoLocation'] + '/*.avi')
@@ -31,7 +36,7 @@ if not os.path.exists(output_folder):
 # add csv header
 with open(output_folder + '/VideoMetadata.csv', 'w', newline='') as csv_file:
     prop_writer = csv.writer(csv_file, delimiter=',', quotechar='"')
-    prop_writer.writerow(['name','type','numFrames','fps','duration','frameWidth','frameHeight'])
+    prop_writer.writerow(['name','type','numFrames','fps','duration','frameWidth','frameHeight','frameSamplingRate'])
 
 # iterate over video files
 for path in video_files:
@@ -65,14 +70,14 @@ for path in video_files:
     print('Video duration: {}'.format(duration))
     
     # get frame width and height
-    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    print('Video resolution: {}x{}'.format(frame_width, frame_height))
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  // downscale_factor
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) // downscale_factor
+    print('Frame resolution: {}x{}'.format(frame_width, frame_height))
     
     # write data to a csv file
     with open(output_folder + '/VideoMetadata.csv', 'a', newline='') as csv_file:
         prop_writer = csv.writer(csv_file, delimiter=',', quotechar='"')
-        prop_writer.writerow([video_name, surgery_type, num_frames, fps, duration, frame_width, frame_height])
+        prop_writer.writerow([video_name, surgery_type, num_frames, fps, duration, frame_width, frame_height, frame_sampling_rate])
         
 print()
 print('Finished successfully')

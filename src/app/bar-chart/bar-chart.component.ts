@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { drag, range, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
+import { Component, Input, OnInit, ChangeDetectionStrategy, NgZone } from '@angular/core';
+import { drag, range, scaleBand, scaleLinear, scaleOrdinal, event, scaleTime, select } from 'd3';
 import { EventService } from '../services/event.service';
 
 @Component({
@@ -15,7 +15,7 @@ export class BarChartComponent implements OnInit {
   private svgElement;
 
   // positioning variables
-  private margin = { top: 70, bottom: 5, left: 87.88, right: 87.88 };
+  private margin = { top: 70, bottom: 0, left: 95, right: 95 };
   private svgWidth;
   private svgHeight = 100;
   private innerWidth;
@@ -26,14 +26,14 @@ export class BarChartComponent implements OnInit {
   private xFramesScale;
   private xTimeScale;
 
-  constructor(private eventService: EventService) { }
+  constructor(private eventService: EventService, private zone: NgZone) { }
 
   ngOnInit() {
 
   }
 
   ngAfterViewInit() {
-    this.svgElement = select('#bar-chart-' + this.videoMetadata.name).attr('height', this.svgHeight);
+    this.svgElement = select(`#bar-chart-${this.videoMetadata.name}`).attr('height', this.svgHeight);
     this.svgWidth = parseFloat(this.svgElement.style('width'));
     this.innerWidth = this.svgWidth - this.margin.left - this.margin.right;
     this.svgHeight = this.innerHeight + this.margin.top + this.margin.bottom;
@@ -45,8 +45,9 @@ export class BarChartComponent implements OnInit {
     this.xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);  // x scale is same for all charts
     this.xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
 
-    this.drawPhaseBar()
-    this.drawPointer()
+    select(`#relative-container-${this.videoMetadata.name}`).style('margin-left', `${this.margin.left}px`)
+    this.drawPhaseBar();
+    this.drawPointer();
   }
 
 
@@ -57,6 +58,26 @@ export class BarChartComponent implements OnInit {
       .range(["#cd5981", "#743b32", "#d24d32", "#c6893f", "#ccb998", "#ccd14e", "#5e7b3b", "#72d263", "#3f4e48", "#76c9bb", "#9697c9", "#6749c1", "#4d2f61", "#c851c5"])
 
     var transformedData = this.transformPhaseAnnotation();
+
+    // add tooltip
+    var tooltip = select(`#relative-container-${this.videoMetadata.name}`)
+      .append('div')
+      .attr('class', `tooltip-${this.videoMetadata.name}`)
+      .style('position', 'absolute')
+      .style('left', `${0}px`)
+      .style('top', `${this.margin.top - 10 - 18}px`)
+      .style('opacity', 0)
+      .style('background-color', 'lightgray')
+      .style('border-radius', '0.25rem')
+      .style('text-align', 'center')
+      .style('font-size', '12px')
+      .style('width', '60px')
+
+    var tip = this.group.append('polygon')
+      .attr('points', `-5,${this.margin.top - 10} 5,${this.margin.top - 10} 0,${this.margin.top}`)
+      .style('fill', 'lightgray')
+      .attr('class', `tip-${this.videoMetadata.name}`)
+      .style('opacity', 0);
 
     // add bar
     this.group.append('g').selectAll('rect')
@@ -69,9 +90,31 @@ export class BarChartComponent implements OnInit {
       .attr('height', yScale.bandwidth())
       .on("mouseover", function (d) {
         select(this).style("opacity", .7);
+        var coords = this.getBBox(); // todo: replace with scale
+        tooltip.text(`Phase: ${d.phase}`).style('opacity', 1)
+          .style('left', `${coords.x + coords.width / 2 - 30}px`)
+
+        var tipCoordinates = tip.attr('points')
+          .split(' ')
+          .map((e) => e.split(','))
+          .map((e) => e.map((v) => parseFloat(v)));
+        console.log(tipCoordinates)
+
+        tipCoordinates[0][0] = coords.x + coords.width / 2 - 5;
+        tipCoordinates[1][0] = coords.x + coords.width / 2 + 5;
+        tipCoordinates[2][0] = coords.x + coords.width / 2;
+
+        tip.style('opacity', 1)
+          .attr('points', () => {
+            return tipCoordinates.map(function (d) {
+              return d.join(",");
+            }).join(" ")
+          })
       })
       .on("mouseout", function (d) {
         select(this).style("opacity", 1);
+        tooltip.style('opacity', 0)
+        tip.style('opacity', 0)
       });
   }
 
@@ -106,12 +149,11 @@ export class BarChartComponent implements OnInit {
       .attr("stroke-width", "3")
       .attr("stroke", "gray");
 
-    var imageFrame = select(`#image-frame-${this.videoMetadata.name}`)
-      .style('position', 'relative')
+    var imageFrame = select(`#relative-container-${this.videoMetadata.name}`)
       .append('div')
-      .attr('class', `image-frame1-${this.videoMetadata.name}`)
+      .attr('class', `image-frame-${this.videoMetadata.name}`)
       .style('position', 'absolute')
-      .style('left', `${this.margin.left - 48}px`)
+      .style('left', `${-48}px`)
       .style('top', `${this.margin.top - 54 - 20}px`)
       .style('padding-left', '5px')
       .style('padding-right', '5px')
@@ -126,7 +168,8 @@ export class BarChartComponent implements OnInit {
       .append('img').attr('src', `/data/Frames/${this.videoMetadata.name}/Frame000000.jpg`)
       .attr('class', `image-${this.videoMetadata.name}`);
 
-    var imageFrameInfo = imageFrame.append('div').style('font-size', '10px')
+    var imageFrameInfo = imageFrame.append('div').style('font-size', '10px').style('text-align', 'center')
+
       .style('height', '15px').html('0 | 00:00:00')
       .attr('class', `image-frame-info-${this.videoMetadata.name}`);
 

@@ -21,12 +21,8 @@ export class SurgeryListItemComponent implements OnInit {
 
   constructor(private dataService: DataService, private cdr: ChangeDetectorRef) { }
 
-  ngOnChange() {
-    console.log('change')
-
-  }
-
   ngOnInit() {
+    // this.cdr.detectChanges()
     this.displayDuration();
     this.dataService.getPhaseAnnotation(this.videoMetadata.name)
       .subscribe(response => {
@@ -36,7 +32,7 @@ export class SurgeryListItemComponent implements OnInit {
             phase: parseInt(data[1])
           }
         });
-        this.cdr.markForCheck()
+        this.cdr.detectChanges()
       })
   }
 
@@ -61,12 +57,12 @@ export class SurgeryListItemComponent implements OnInit {
           exposureIndex: parseInt(data[14])
         }
       });
-      this.cdr.markForCheck()
+      this.cdr.detectChanges()
     })
 
     this.dataService.getInstrumentAnnotation(this.videoMetadata.name).subscribe(response => {
       this.instrumentAnnotation = csvParse(response, autoType)
-      this.cdr.markForCheck()
+      this.cdr.detectChanges()
     })
 
   }
@@ -88,6 +84,7 @@ export class SurgeryListItemComponent implements OnInit {
     } else {
       this.cardExpanded = false;
     }
+    // this.cdr.detectChanges()
   }
 
 }

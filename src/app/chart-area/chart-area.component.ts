@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { axisBottom, axisLeft, curveBasis, line, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select, drag } from 'd3';
+import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
-
 
 @Component({
   selector: 'app-chart-area',
@@ -20,8 +19,8 @@ export class ChartAreaComponent implements OnInit {
 
   private svgWidth;
   private innerWidth;
-  private margin = { top: 20, bottom: 20, left: 87.88, right: 87.88 };
-  private innerHeight = 160;
+  private margin = { top: 20, bottom: 20, left: 95, right: 95 };
+  private innerHeight = 140;
 
 
   // positioning variables for chart area
@@ -156,15 +155,18 @@ export class ChartAreaComponent implements OnInit {
       .y(function (d, i) { return yScale(d.value); })
       .curve(curveBasis);  // curve interpolation
 
-    group.selectAll('.line-path')
+    var paths = group.selectAll('.line-path')
       .data(nestedData).enter().append('path')
-      .attr('class', (d) => `${d.header}-${this.videoMetadata.name}`)
+      .attr('id', (d) => `${d.header}-${this.videoMetadata.name}`)
+      .attr('class', (d) => `line-${this.videoMetadata.name}`)
       .attr('d', d => lineGenerator(d.values))
       .style('fill', 'none')
       .style('stroke', (d) => colorScale(d.header))
       .style('stroke-width', '1')
       .style('stroke-linejoin', 'round')
       .style('mix-blend-mode', 'multiply');
+
+    paths.filter((d) => d.header !== 'currentGasFlowRate').attr('visibility', 'hidden')
   }
 
 
@@ -176,17 +178,24 @@ export class ChartAreaComponent implements OnInit {
       var previousVisible = false;
       var from = 0;
       var to = 0;
+      var previousFrameNr = 0;
       for (var row of data) {  // iterate over instrumentAnnotation rows
         if (row[header] == 1 && !previousVisible) {  // values for instrument is 1 and it is the first one
           previousVisible = true;
           from = row['Frame']
+        } else if (previousVisible && previousFrameNr + 1500 != row['Frame']) {  // missing data
+          to = previousFrameNr + 1500
+          previousVisible = false
+          result.push({ 'header': header, 'from': from, 'to': to })
         } else if (row[header] == 0 && previousVisible) {  // instrument is not visible anymore
           to = row['Frame']
           previousVisible = false
           result.push({ 'header': header, 'from': from, 'to': to })
         }
+        previousFrameNr = row['Frame']
       }
     }
+    console.log(result)
     return result
   }
 
@@ -202,7 +211,7 @@ export class ChartAreaComponent implements OnInit {
     // return result;
 
     var sampler = modeMedian();
-    sampler.bucketSize(1000);
+    sampler.bucketSize(100);
     sampler.value(d => d.value);
     var result = sampler(data);
     return result;

@@ -12,7 +12,7 @@ export class EventService {
   public dragBehavior(name, group, width, marginLeft, marginTop, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
-    var imageFrame = selectAll(`.image-frame1-${name}`);
+    var imageFrame = selectAll(`.image-frame-${name}`);
     var imageFrameTip = selectAll(`.image-frame-tip-${name}`);
     var imageFrameInfo = selectAll(`.image-frame-info-${name}`);
 
@@ -21,7 +21,7 @@ export class EventService {
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(xFramesScale.invert(xUpdated));
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
-    imageFrame.style('left', `${marginLeft + xUpdated - 48}px`);
+    imageFrame.style('left', `${xUpdated - 48}px`);
     imageFrameTip.attr('points', `${xUpdated - 10},${marginTop} ${xUpdated + 10},${marginTop} ${xUpdated},${marginTop + 20}`)
     var time = xTimeScale.invert(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
@@ -30,7 +30,7 @@ export class EventService {
   public clickBehavior(name, group, width, marginLeft, marginTop, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
-    var imageFrame = selectAll(`.image-frame1-${name}`);
+    var imageFrame = selectAll(`.image-frame-${name}`);
     var imageFrameTip = selectAll(`.image-frame-tip-${name}`);
     var imageFrameInfo = selectAll(`.image-frame-info-${name}`);
 
@@ -40,7 +40,7 @@ export class EventService {
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(xFramesScale.invert(xUpdated));
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
-    imageFrame.style('left', `${marginLeft + xUpdated - 48}px`)
+    imageFrame.style('left', `${xUpdated - 48}px`)
     imageFrameTip.attr('points', `${xUpdated - 10},${marginTop} ${xUpdated + 10},${marginTop} ${xUpdated},${marginTop + 20}`)
     var time = xTimeScale.invert(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)

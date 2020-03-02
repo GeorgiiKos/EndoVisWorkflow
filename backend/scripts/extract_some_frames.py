@@ -7,6 +7,7 @@ import cv2
 import json  
 import re
 import os
+import sys
 
 # open configuration file
 with open('../config.json') as json_file:  
@@ -35,6 +36,10 @@ if not os.path.exists(output_folder):
 
 # iterate over video files
 for path in video_files:
+    # check if video exists
+    if not os.path.exists(path):
+        sys.exit('Video file does not exist')
+    
     # extract filename from path
     video_name = os.path.basename(path)
     video_name = re.search(regex, path).group(1)

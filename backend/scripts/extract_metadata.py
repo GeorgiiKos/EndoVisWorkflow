@@ -53,7 +53,7 @@ for path in video_files:
     cap = cv2.VideoCapture(path)
     
     # get total number of frames
-    num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) + 1)
+    num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     print('Number of frames: %d' % num_frames)
     
     # get fps

@@ -8,6 +8,7 @@ import { SurgeryListItemComponent } from './surgery-list-item/surgery-list-item.
 import { BarChartComponent } from './bar-chart/bar-chart.component';
 import { TableComponent } from './table/table.component';
 import { ChartAreaComponent } from './chart-area/chart-area.component';
+import { ControlPanelComponent } from './control-panel/control-panel.component';
 
 
 @NgModule({
@@ -18,6 +19,7 @@ import { ChartAreaComponent } from './chart-area/chart-area.component';
     BarChartComponent,
     ChartAreaComponent,
     TableComponent,
+    ControlPanelComponent,
   ],
   imports: [
     BrowserModule,

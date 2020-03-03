@@ -137,7 +137,7 @@ export class ChartAreaComponent implements OnInit {
     // add y-axis
     group.append('g')
       .attr('class', 'y-axis')
-      .call(axisLeft(yScale));
+      .call(axisLeft(yScale).ticks(this.positioning.chartAreaTicks[i]));
 
     var nestedData = headers.map((header) =>
       ({

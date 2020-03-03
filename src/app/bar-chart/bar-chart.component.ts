@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, NgZone, ɵConsole } from '@angular/core';
-import { drag, range, scaleBand, scaleLinear, scaleOrdinal, event, scaleTime, select } from 'd3';
-import { EventService } from '../services/event.service';
+import { Component, Input, NgZone, OnInit } from '@angular/core';
+import { drag, range, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
 import { PositioningService } from '../positioning.service';
+import { EventService } from '../services/event.service';
 
 @Component({
   selector: 'app-bar-chart',
@@ -13,17 +13,6 @@ export class BarChartComponent implements OnInit {
   @Input() videoMetadata;
   @Input() phaseAnnotation;
 
-  private svgElement;
-
-  // positioning variables
-  private svgWidth;
-  private innerWidth;
-
-  private group;
-
-  private xFramesScale;
-  private xTimeScale;
-
   constructor(private eventService: EventService, private zone: NgZone, private positioning: PositioningService) { }
 
   ngOnInit() {
@@ -31,30 +20,31 @@ export class BarChartComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    console.log(this.positioning.barChartHeight)
-    this.svgElement = select(`#bar-chart-${this.videoMetadata.name}`).attr('height', this.positioning.barChartHeight);  // set height of the svg element
-    this.svgWidth = parseFloat(this.svgElement.style('width'));  // get width of the svg element
-    this.innerWidth = this.svgWidth - this.positioning.marginLeft - this.positioning.marginRight;
-    // this.svgHeight = this.innerHeight + this.margin.top + this.margin.bottom;
-    // this.svgElement.attr('height', this.svgHeight);
+    var svgElement = select(`#bar-chart-${this.videoMetadata.name}`).attr('height', this.positioning.barChartHeight);  // set height of the svg element
+    var svgWidth = parseFloat(svgElement.style('width'));  // get width of the svg element
+    var innerWidth = svgWidth - this.positioning.marginLeft - this.positioning.marginRight;  // calculate width of the bar
 
     // create group for the graph and move it 
-    this.group = this.svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`).attr('width', this.innerWidth);
+    var group = svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`)
 
-    this.xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);  // x scale is same for all charts
-    this.xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
+    // get x scales
+    var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);  // x scale is same for all charts
+    var xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
 
+    // move relative container to the right
     select(`#relative-container-${this.videoMetadata.name}`).style('margin-left', `${this.positioning.marginLeft}px`)
-    this.drawPhaseBar();
-    this.drawPointer();
+
+    this.drawPhaseBar(group, xFrameScale);
+    this.drawPointer(group, svgElement, innerWidth, xFrameScale, xTimeScale);
   }
 
 
-  private drawPhaseBar() {
+  private drawPhaseBar(group, xFrameScale) {
     // get scales
     var yScale = scaleBand().domain(['Phase']).range([this.positioning.barChartInnerHeight, 0]);
     var colorScale = scaleOrdinal().domain(range(14))
       .range(["#cd5981", "#743b32", "#d24d32", "#c6893f", "#ccb998", "#ccd14e", "#5e7b3b", "#72d263", "#3f4e48", "#76c9bb", "#9697c9", "#6749c1", "#4d2f61", "#c851c5"])
+      .unknown('lime');
 
     var transformedData = this.transformPhaseAnnotation();
 
@@ -74,19 +64,19 @@ export class BarChartComponent implements OnInit {
       .style('font-size', `${this.positioning.barChartTooltipBubbleFontSize}px`)
       .style('width', `${this.positioning.barChartTooltipBubbleWidth}px`)
 
-    var tooltipArrow = this.group.append('polygon')
+    var tooltipArrow = group.append('polygon')
       .attr('points', `${0 - this.positioning.barChartTooltipArrowHeight / 2},${this.positioning.barChartMarginTop - this.positioning.barChartTooltipArrowHeight} ${this.positioning.barChartTooltipArrowHeight / 2},${this.positioning.barChartMarginTop - this.positioning.barChartTooltipArrowHeight} 0,${this.positioning.barChartMarginTop}`)
       .style('fill', tooltipColor)
       .attr('class', `tip-${this.videoMetadata.name}`)
       .style('opacity', 0);
 
     // add bar
-    this.group.append('g').selectAll('rect')
+    group.append('g').selectAll('rect')
       .data(transformedData)
       .enter().append('rect')
-      .attr('x', (d) => { return this.xFramesScale(d.from); })
+      .attr('x', (d) => { return xFrameScale(d.from); })
       .attr('y', this.positioning.barChartMarginTop)
-      .attr('width', (d) => { return this.xFramesScale(d.to - d.from); })
+      .attr('width', (d) => { return xFrameScale(d.to - d.from); })
       .attr('fill', (d) => { return colorScale(d.phase); })
       .attr('height', yScale.bandwidth())
       .on("mouseover", function (d) {
@@ -139,8 +129,8 @@ export class BarChartComponent implements OnInit {
     return result;
   }
 
-  private drawPointer() {
-    var pointer = this.group.append('line')
+  private drawPointer(group, svgElement, innerWidth, xFrameScale, xTimeScale) {
+    var pointer = group.append('line')
       .attr('class', `pointer-${this.videoMetadata.name}`)
       .attr("x1", 0)
       .attr("y1", this.positioning.barChartMarginTop)
@@ -175,17 +165,17 @@ export class BarChartComponent implements OnInit {
       .text('0 | 00:00:00')
       .attr('class', `image-frame-info-${this.videoMetadata.name}`);
 
-    var imageFrameTip = this.group.append('polygon')
+    var imageFrameTip = group.append('polygon')
       .attr('points', `${0 - this.positioning.barChartImageFrameArrowHeight / 2},${this.positioning.barChartMarginTop} ${this.positioning.barChartImageFrameArrowHeight / 2},${this.positioning.barChartMarginTop} 0,${this.positioning.barChartMarginTop + this.positioning.barChartImageFrameArrowHeight}`)
       .style('fill', 'gray')
       .attr('class', `image-frame-tip-${this.videoMetadata.name}`);
 
     // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, this.group, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale)));
-    imageFrameTip.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, this.group, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale)));
+    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+    imageFrameTip.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
 
     // add click behavior for svg element
-    this.svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, this.group, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale));
+    svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
   }
 
 }

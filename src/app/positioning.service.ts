@@ -31,7 +31,8 @@ export class PositioningService {
   // chart area
   chartAreaMarginTop = 5; // applied to each graph
   chartAreaMarginBottom = 20;  // applied to each graph
-  chartAreaInnerHeight = [140, 140, 70, 140];
+  chartAreaInnerHeight = [100, 100, 50, 120];
+  chartAreaTicks = [9, 8, 2];
 
   get barChartHeight() {
     return this.barChartMarginTop + this.barChartInnerHeight + this.barChartMarginBottom;

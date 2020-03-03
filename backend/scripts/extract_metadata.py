@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This script extracts metadata from videos
+This script extracts metadata from all available videos
 """
 
 import cv2

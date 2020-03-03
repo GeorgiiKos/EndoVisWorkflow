@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This script extracts and rescales frames
+This script extracts and rescales frames from particular videos
 """
 
 import cv2

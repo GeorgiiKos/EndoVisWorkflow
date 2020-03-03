@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
+import { PositioningService } from '../positioning.service';
 
 @Component({
   selector: 'app-chart-area',
@@ -19,29 +20,24 @@ export class ChartAreaComponent implements OnInit {
 
   private svgWidth;
   private innerWidth;
-  private margin = { top: 20, bottom: 20, left: 95, right: 95 };
-  private innerHeight = 140;
 
 
   // positioning variables for chart area
   private svgElement;
-  private svgHeight;
   private chartAreaGroup;
-  private innerChartAreaHeight;
 
-  constructor(public eventService: EventService) { }
+  constructor(public eventService: EventService, private positioning: PositioningService) { }
 
   ngOnInit() {
 
   }
 
   ngAfterViewInit() {
-    this.svgHeight = this.innerHeight * 4 + this.margin.top * 4 + this.margin.bottom * 4
-    this.svgElement = select('#chart-area-' + this.videoMetadata.name).attr('height', this.svgHeight);
-    this.chartAreaGroup = this.svgElement.append('g').attr('transform', `translate(${this.margin.left}, 0)`);
+    this.svgElement = select('#chart-area-' + this.videoMetadata.name).attr('height', this.positioning.chartAreaHeight);
+    this.chartAreaGroup = this.svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`);
     this.svgWidth = parseFloat(this.svgElement.style('width'));
 
-    this.innerWidth = this.svgWidth - this.margin.left - this.margin.right;
+    this.innerWidth = this.svgWidth - this.positioning.marginLeft - this.positioning.marginRight;
 
     this.xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);  // x scale is same for all charts
     this.xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
@@ -57,20 +53,20 @@ export class ChartAreaComponent implements OnInit {
 
     // get scale functions
     var xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
-    var yScale = scaleBand().domain(labels).range([this.innerHeight, 0])
+    var yScale = scaleBand().domain(labels).range([this.positioning.chartAreaInnerHeight[3], 0])
     var headerScale = scaleOrdinal().domain(this.instrumentAnnotation.columns.slice(1)).range(labels)
     var colorScale = scaleOrdinal().domain(labels)
       .range(["#ff58ab", "#3c5b16", "#5e38b4", "#ff5a09", "#0191bb", "#ff5556", "#91d4ba", "#cd0071", "#ffb555", "#c3baff", "#784543", "#ffabc0"])
 
     // create group for the graph and move it 
     var group = this.chartAreaGroup.append('g')
-      .attr('transform', `translate(0, ${this.margin.top * 4 + this.innerHeight * 3})`)
+      .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(3)})`)
       .attr('class', `content-${this.videoMetadata.name}`);
 
     // add x-axis
     group.append('g')
       .attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.innerHeight})`)
+      .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[3]})`)
       .call(axisBottom(xFramesScale));
 
     // add y-axis
@@ -127,15 +123,15 @@ export class ChartAreaComponent implements OnInit {
 
   private drawSingleDeviceDataGraph(i, range, headers, colorScale) {
     var group = this.chartAreaGroup.append('g')
-      .attr('transform', `translate(0, ${this.margin.top * (i + 1) + this.innerHeight * i})`)
+      .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(i)})`)
       .attr('class', `content-${this.videoMetadata.name}`);
     var xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
-    var yScale = scaleLinear().domain(range).range([this.innerHeight, 0])
+    var yScale = scaleLinear().domain(range).range([this.positioning.chartAreaInnerHeight[i], 0])
 
     // add x-axis
     group.append('g')
       .attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.innerHeight})`)
+      .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[i]})`)
       .call(axisBottom(xFramesScale));
 
     // add y-axis
@@ -233,15 +229,15 @@ export class ChartAreaComponent implements OnInit {
       .attr("x1", xPos)
       .attr("y1", 0)
       .attr("x2", xPos)
-      .attr("y2", this.svgHeight)
-      .attr("stroke-width", "3")
+      .attr("y2", this.positioning.chartAreaHeight)
+      .attr("stroke-width", this.positioning.pointerWidth)
       .attr("stroke", "gray");
 
     // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, this.chartAreaGroup, this.innerWidth, this.margin.left, 70, this.xFramesScale, this.xTimeScale)));
+    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, this.chartAreaGroup, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale)));
 
     // add click behavior for svg element
-    this.svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, this.chartAreaGroup, this.innerWidth, this.margin.left, 70, this.xFramesScale, this.xTimeScale));
+    this.svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, this.chartAreaGroup, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale));
   }
 
 

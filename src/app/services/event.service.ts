@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { mouse, selectAll } from 'd3';
+import { PositioningService } from '../positioning.service';
 
 
 @Injectable({
@@ -7,9 +8,9 @@ import { mouse, selectAll } from 'd3';
 })
 export class EventService {
 
-  constructor() { }
+  constructor(private pos: PositioningService) { }
 
-  public dragBehavior(name, group, width, marginLeft, marginTop, xFramesScale, xTimeScale) {
+  public dragBehavior(name, group, width, frameWidth, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
     var imageFrame = selectAll(`.image-frame-${name}`);
@@ -21,13 +22,13 @@ export class EventService {
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(xFramesScale.invert(xUpdated));
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
-    imageFrame.style('left', `${xUpdated - 48}px`);
-    imageFrameTip.attr('points', `${xUpdated - 10},${marginTop} ${xUpdated + 10},${marginTop} ${xUpdated},${marginTop + 20}`)
+    imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
+    imageFrameTip.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
     var time = xTimeScale.invert(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
 
-  public clickBehavior(name, group, width, marginLeft, marginTop, xFramesScale, xTimeScale) {
+  public clickBehavior(name, group, width, frameWidth, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
     var imageFrame = selectAll(`.image-frame-${name}`);
@@ -40,12 +41,11 @@ export class EventService {
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(xFramesScale.invert(xUpdated));
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
-    imageFrame.style('left', `${xUpdated - 48}px`)
-    imageFrameTip.attr('points', `${xUpdated - 10},${marginTop} ${xUpdated + 10},${marginTop} ${xUpdated},${marginTop + 20}`)
+    imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
+    imageFrameTip.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
     var time = xTimeScale.invert(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
-
 
   private getImageUrl(name, frameNr) {  // TODO: read from videoMetadata
     while (frameNr % 500 != 0) { frameNr--; }

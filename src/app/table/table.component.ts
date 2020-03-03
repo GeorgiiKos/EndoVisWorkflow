@@ -32,7 +32,7 @@ export class TableComponent implements OnInit {
 
     var table = select(`#table-${this.videoMetadata.name}`)
     var thead = table.append('thead').style('user-select', 'none').style('cursor', 'pointer');
-    var tbody = table.append('tbody');
+    var tbody = table.append('tbody').style('font-size', '0.8rem');
 
     // append the header row
     thead = thead.append('tr')

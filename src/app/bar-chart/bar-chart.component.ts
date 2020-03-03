@@ -1,6 +1,6 @@
 import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { drag, range, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
-import { PositioningService } from '../positioning.service';
+import { PositioningService } from '../services/positioning.service';
 import { EventService } from '../services/event.service';
 
 @Component({

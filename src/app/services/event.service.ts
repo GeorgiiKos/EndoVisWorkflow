@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { mouse, selectAll } from 'd3';
-import { PositioningService } from '../positioning.service';
+import { PositioningService } from './positioning.service';
 
 
 @Injectable({

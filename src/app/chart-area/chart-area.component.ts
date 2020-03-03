@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
-import { PositioningService } from '../positioning.service';
+import { PositioningService } from '../services/positioning.service';
 
 @Component({
   selector: 'app-chart-area',

@@ -32,7 +32,7 @@ export class PositioningService {
   chartAreaMarginTop = 5; // applied to each graph
   chartAreaMarginBottom = 20;  // applied to each graph
   chartAreaInnerHeight = [100, 100, 50, 120];
-  chartAreaTicks = [9, 8, 2];
+  chartAreaTicks = [9, 8, 2];  // instrumentAnnotation graph has a fixed number of ticks
 
   get barChartHeight() {
     return this.barChartMarginTop + this.barChartInnerHeight + this.barChartMarginBottom;

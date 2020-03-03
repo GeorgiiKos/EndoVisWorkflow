@@ -3,6 +3,7 @@ import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, s
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
 import { PositioningService } from '../services/positioning.service';
+import { ScaleService } from '../services/scale.service';
 
 @Component({
   selector: 'app-chart-area',
@@ -26,7 +27,7 @@ export class ChartAreaComponent implements OnInit {
   private svgElement;
   private chartAreaGroup;
 
-  constructor(public eventService: EventService, private positioning: PositioningService) { }
+  constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService) { }
 
   ngOnInit() {
 
@@ -112,12 +113,12 @@ export class ChartAreaComponent implements OnInit {
     ]
     var allHeaders = ['currentGasFlowRate', 'targetGasFlowRate', ' currentGasPressure', 'targetGasPressure', 'usedGasVolume', 'gasSupplyPressure', 'deviceOn', 'allLightsOff', 'intensityLight1', 'intensityLight2', 'intensity', 'whiteBalance', 'gains', 'exposureIndex']
 
-    var colorScale = scaleOrdinal()
-      .domain(allHeaders)
-      .range(['red', 'blue', 'green'])
+    // var colorScale = scaleOrdinal()
+    //   .domain(allHeaders)
+    //   .range(['red', 'blue', 'green'])
 
     graphData.forEach((element, i) => {
-      this.drawSingleDeviceDataGraph(i, element.range, element.headers, colorScale)
+      this.drawSingleDeviceDataGraph(i, element.range, element.headers, this.scales.deviceDataColorScale)
     });
   }
 

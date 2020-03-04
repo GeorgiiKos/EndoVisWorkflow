@@ -30,7 +30,7 @@ export class TableComponent implements OnInit {
 
     var sortAscending = false;
 
-    var table = select(`#table-${this.videoMetadata.name}`)
+    var table = select(`#table-${this.videoMetadata.name}`);
     var thead = table.append('thead').style('user-select', 'none').style('cursor', 'pointer');
     var tbody = table.append('tbody').style('font-size', '0.8rem');
 
@@ -42,7 +42,7 @@ export class TableComponent implements OnInit {
       .append('th')
       .text((column) => column)
       .attr('class', 'header')
-      .attr('class', (d, i) => d === 'Phase' ? 'asc' : '')  // display arrow
+      .attr('class', (d, i) => d === 'Phase' ? 'asc' : '');  // display arrow
 
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
@@ -89,7 +89,7 @@ export class TableComponent implements OnInit {
     rows.filter((d, i) => d.Phase == longestPhase).style('background-color', 'lightgreen');
 
     // add footer
-    var legend = table.append('caption');  // use table caption as footer
+    var legend = select(`#table-legend-${this.videoMetadata.name}`);  // use table caption as footer
     var div1 = legend.append('div');
     var div2 = legend.append('div');
 
@@ -109,7 +109,7 @@ export class TableComponent implements OnInit {
       .style('margin-right', '.5rem')
       .style('background-color', 'lightpink');
 
-    div2.append('span').text('Missing phase(s)');
+    div2.append('span').text('Missing phase');
   }
 
   private groupByPhase() {

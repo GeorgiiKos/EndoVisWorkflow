@@ -52,13 +52,13 @@ export class BarChartComponent implements OnInit {
       .attr('class', `tooltipBubble-${this.videoMetadata.name}`)
       .style('position', 'absolute')
       .style('left', '0px')
-      .style('top', `${this.pos.barChartMarginTop - this.pos.barChartTooltipBubbleHeight - this.pos.barChartTooltipArrowHeight}px`)  // todo: write function
+      .style('top', `${this.pos.barChartMarginTop - this.pos.barChartTooltipBubbleHeight - this.pos.barChartTooltipArrowHeight}px`)
       .style('opacity', 0)
       .style('background-color', 'lightgray')
       .style('border-radius', '0.25rem')
       .style('text-align', 'center')
       .style('font-size', `${this.pos.barChartTooltipBubbleFontSize}px`)
-      .style('width', `${this.pos.barChartTooltipBubbleWidth}px`)
+      .style('width', `${this.pos.barChartTooltipBubbleWidth}px`);
 
     // add tooltip arrow
     var tooltipArrow = group.append('polygon')
@@ -102,12 +102,12 @@ export class BarChartComponent implements OnInit {
     });
   }
 
-  // TODO: maybe it is possible to do it with d3?
+  // TODO: unit tests
   public transformPhaseAnnotation() {
     var currentPhase = this.phaseAnnotation[0].phase;
     var from = 0;
     var to = 0;
-    var result = []
+    var result = [];
     for (var row of this.phaseAnnotation) {
       if (row.phase !== currentPhase) {
         result.push({ phase: currentPhase, from: from, to: to });
@@ -145,7 +145,7 @@ export class BarChartComponent implements OnInit {
       .style('padding-right', `${this.pos.barChartImageFramePadding}px`)
       .style('padding-top', `${this.pos.barChartImageFramePadding}px`)
       .style('background-color', 'gray')
-      .style('border-radius', '.25rem')
+      .style('border-radius', '.25rem');
 
     // add image
     var image = imageFrame

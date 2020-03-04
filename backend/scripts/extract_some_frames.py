@@ -9,6 +9,8 @@ import re
 import os
 import sys
 
+video_files = []  # <-- define list of videos here, example 'Prokto6'
+
 # open configuration file
 with open('../config.json') as json_file:  
     config = json.load(json_file)
@@ -25,7 +27,6 @@ print('*** Extracting every {}th frame ***'.format(frame_sampling_rate))
 regex = '(([A-Z][a-z]+)(\d+))\.avi'
 
 # get sorted list of video files
-video_files = []  # <-- define list of videos here, example 'Prokto6'
 video_files = map(lambda name: config['videoLocation'] + '/' + name + '.avi', video_files)
 video_files = sorted(video_files, key = lambda x: (re.search(regex, x).group(2), int(re.search(regex, x).group(3))))
 

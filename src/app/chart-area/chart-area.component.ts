@@ -89,6 +89,7 @@ export class ChartAreaComponent implements OnInit {
       .attr('class', 'y-axis')
       .call(axisLeft(yScale).ticks(this.pos.chartAreaTicks[i]));
 
+    // TODO: unit tests
     var nestedData = headers.map((header) =>
       ({
         header: header, values: this.applyMeanDownsampling(this.deviceData.map((row) =>
@@ -188,7 +189,7 @@ export class ChartAreaComponent implements OnInit {
     });
   }
 
-  // TODO: maybe it is possible to do it with d3?
+  // TODO: unit tests
   private transformInstrumentAnnotation(data) {
     var result = [];
     for (var header of this.instrumentAnnotation.columns.slice(1)) {  // iterate over headers (omit column 'Frame')
@@ -229,15 +230,6 @@ export class ChartAreaComponent implements OnInit {
 
   // mean downsampling
   private applyMeanDownsampling(data) {
-    // var binSize = 200;
-    // var result = [];
-    // for (var i = 0; i < data.length; i += binSize) {
-    //   var slice = data.slice(i, i + binSize).map(d => d.value);
-    //   var meanValue = mean(slice)
-    //   result.push({ frame: i + binSize / 2, value: meanValue })
-    // }
-    // return result;
-
     var sampler = modeMedian();
     sampler.bucketSize(100);
     sampler.value(d => d.value);

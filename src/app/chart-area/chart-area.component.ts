@@ -34,7 +34,7 @@ export class ChartAreaComponent implements OnInit {
     var xTimeScale = scaleTime().domain([0, this.videoMetadata.numFrames]).range([new Date(0), new Date(this.videoMetadata.duration)]);
 
     this.drawDeviceDataGraph(globalGroup, innerWidth, xFrameScale);
-    this.drawInstrumentAnnotationGraph(globalGroup, xFrameScale);
+    this.drawInstrumentAnnotationGraph(globalGroup, innerWidth, xFrameScale);
     this.drawPointer(globalGroup, svgElement, innerWidth, xFrameScale, xTimeScale);
   }
 
@@ -71,11 +71,6 @@ export class ChartAreaComponent implements OnInit {
       .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[i]})`)
       .call(axisBottom(xFrameScale));
 
-    // add y-axis
-    group.append('g')
-      .attr('class', 'y-axis')
-      .call(axisLeft(yScale).ticks(this.positioning.chartAreaTicks[i]));
-
     // add grid lines
     group.append('g')
       .attr('class', 'grid')
@@ -84,9 +79,13 @@ export class ChartAreaComponent implements OnInit {
         .ticks(this.positioning.chartAreaTicks[i])
         .tickFormat(''))
       .call(g => g.select('.domain').remove())
-      .call(g => g.select('line').remove())
+      .call(g => g.select('line').remove())  // remove first line
       .call(g => g.selectAll('line').style('stroke', '#ededed'));
 
+    // add y-axis
+    group.append('g')
+      .attr('class', 'y-axis')
+      .call(axisLeft(yScale).ticks(this.positioning.chartAreaTicks[i]));
 
     var nestedData = headers.map((header) =>
       ({
@@ -114,7 +113,7 @@ export class ChartAreaComponent implements OnInit {
     paths.filter((d) => d.header !== 'currentGasFlowRate').attr('visibility', 'hidden')
   }
 
-  private drawInstrumentAnnotationGraph(globalGroup, xFrameScale) {
+  private drawInstrumentAnnotationGraph(globalGroup, innerWidth, xFrameScale) {
     // get scale functions
     var yScale = scaleBand().domain(this.scales.instrumentAnnotationHeaderScale.range()).range([this.positioning.chartAreaInnerHeight[3], 0])
 
@@ -128,6 +127,18 @@ export class ChartAreaComponent implements OnInit {
       .attr('class', 'x-axis')
       .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[3]})`)
       .call(axisBottom(xFrameScale));
+
+    // add grid lines
+    group.append('g')
+      .attr('class', 'grid')
+      .call(axisLeft(yScale)
+        .tickSize(-innerWidth)
+        .ticks(this.positioning.chartAreaTicks[3])
+        .tickFormat(''))
+      .call(g => g.select('.domain').remove())
+      .call(g => g.select('line').remove())  // remove first line
+      .call(g => g.selectAll('line').style('stroke', '#ededed'))
+      .attr('transform', `translate(0, ${yScale.bandwidth() / 2})`);
 
     // add y-axis
     group.append('g')

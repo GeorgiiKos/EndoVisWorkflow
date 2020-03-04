@@ -29,8 +29,8 @@ export class PositioningService {
   barChartImageFrameArrowHeight = 16;
 
   // chart area
-  chartAreaMarginTop = 5; // applied to each graph
-  chartAreaMarginBottom = 20;  // applied to each graph
+  chartAreaMarginTop = [5, 0, 0, 0];
+  chartAreaMarginBottom = [20, 20, 20, 20];
   chartAreaInnerHeight = [100, 100, 50, 120];
   chartAreaTicks = [9, 8, 2];  // instrumentAnnotation graph has a fixed number of ticks
 
@@ -39,20 +39,23 @@ export class PositioningService {
   }
 
   get chartAreaHeight() {
-    return sum(this.chartAreaInnerHeight) + (this.chartAreaMarginTop * this.chartAreaInnerHeight.length) + (this.chartAreaMarginBottom * this.chartAreaInnerHeight.length);
+    return sum(this.chartAreaInnerHeight) + sum(this.chartAreaMarginTop) + sum(this.chartAreaMarginBottom);
   }
 
+  // this method calculates position for each graph in the chart area
   public calcChartAreaYPos(index) {
     var sum = 0;
     for (var i = 0; i < index; i++) {
-      sum += this.chartAreaInnerHeight[i];
+      sum += this.chartAreaInnerHeight[i] + this.chartAreaMarginBottom[i];
     }
-    return this.chartAreaMarginTop * (index + 1) + this.chartAreaMarginBottom * index + sum;
+    for (var i = 0; i < index + 1; i++) {
+      sum += this.chartAreaMarginTop[i];
+    }
+    return sum;
   }
 
   // this method converts polygon points to array
   public convertPointsToArray(points) {
-    console.log(points)
     return points.split(' ')
       .map((e) => e.split(','))
       .map((e) => e.map((v) => parseFloat(v)));

@@ -171,11 +171,11 @@ export class BarChartComponent implements OnInit {
       .attr('class', `image-frame-arrow-${this.videoMetadata.name}`);
 
     // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
-    imageFrameArrow.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+    imageFrameArrow.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
 
     // add click behavior for svg element
-    svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+    svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
   }
 
 }

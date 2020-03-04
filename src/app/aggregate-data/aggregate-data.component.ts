@@ -126,7 +126,7 @@ export class AggregateDataComponent implements OnInit {
 
   private getPercentageAndDuration(totalFrames: number) {
     var percent = (totalFrames / this.videoMetadata.numFrames * 100).toFixed(2);
-    var dateObj = new Date(Math.floor(totalFrames / this.videoMetadata.fps) * 1000);
+    var dateObj = new Date(Math.round(totalFrames / this.videoMetadata.fps * 1000));
     var duration = `${('0' + dateObj.getUTCHours()).slice(-2)}:${('0' + dateObj.getUTCMinutes()).slice(-2)}:${('0' + dateObj.getUTCSeconds()).slice(-2)}`;
     return `${percent}% (${duration})`;
   }

@@ -30,7 +30,7 @@ export class BarChartComponent implements OnInit {
 
     // get x scales
     var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);
-    var xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
+    var xTimeScale = scaleTime().domain([0, this.videoMetadata.numFrames]).range([new Date(0), new Date(this.videoMetadata.duration)]);
 
     // move relative container to the right
     select(`#relative-container-${this.videoMetadata.name}`).style('margin-left', `${this.positioning.marginLeft}px`);

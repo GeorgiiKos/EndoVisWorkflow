@@ -24,7 +24,7 @@ export class EventService {
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
     imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
     imageFrameArrow.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
-    var time = xTimeScale.invert(frameNr);
+    var time = xTimeScale(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
 
@@ -43,7 +43,7 @@ export class EventService {
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
     imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
     imageFrameArrow.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
-    var time = xTimeScale.invert(frameNr);
+    var time = xTimeScale(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
 

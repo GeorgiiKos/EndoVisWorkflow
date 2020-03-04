@@ -16,17 +16,6 @@ export class ChartAreaComponent implements OnInit {
   @Input() deviceData;
   @Input() instrumentAnnotation;
 
-  // private xFramesScale;
-  // private xTimeScale;
-
-  // private svgWidth;
-  // private innerWidth;
-
-
-  // // positioning variables for chart area
-  // private svgElement;
-  // private chartAreaGroup;
-
   constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService) { }
 
   ngOnInit() {
@@ -42,7 +31,7 @@ export class ChartAreaComponent implements OnInit {
 
     // get x scales
     var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);
-    var xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
+    var xTimeScale = scaleTime().domain([0, this.videoMetadata.numFrames]).range([new Date(0), new Date(this.videoMetadata.duration)]);
 
     this.drawDeviceDataGraph(globalGroup, xFrameScale);
     this.drawInstrumentAnnotationGraph(globalGroup, xFrameScale);

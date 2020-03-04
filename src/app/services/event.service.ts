@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { mouse, select, selectAll } from 'd3';
 import { PositioningService } from './positioning.service';
+import { ScaleService } from './scale.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventService {
 
-  constructor(private pos: PositioningService) { }
+  constructor(private pos: PositioningService, private scales: ScaleService) { }
 
   public movePointer(name, group, width, frameSamplingRate, frameWidth, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
@@ -40,7 +41,8 @@ export class EventService {
     // extract instrument names from class names
     var rectsIntersect = rects.filter((d) => d.from <= frameNr && d.to >= frameNr);
     var columns = [];
-    rectsIntersect.each(function (d) { columns.push(select(this).attr('class').split(' ')[1]) })
+    rectsIntersect.each(function (d) { columns.push(select(this).attr('class').split(' ')[1]) });
+    columns = columns.map((e) => this.scales.instrumentAnnotationHeaderScale(e));
 
     labels.filter((d) => columns.includes(d)).style('font-weight', 'bold').style('fill', 'red');  // find labels for rects that intersect with pointer
     rectsIntersect.attr('opacity', 0.7);  // add effect for rects that intersect with pointer

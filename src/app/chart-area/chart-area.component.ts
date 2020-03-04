@@ -134,7 +134,7 @@ export class ChartAreaComponent implements OnInit {
     group.append('g').selectAll('rect')
       .data(transformedData)
       .enter().append('rect')
-      .attr('class', `instrument-${this.videoMetadata.name}`)
+      .attr('class', (d) => `instrument-${this.videoMetadata.name} ${d.header}`)
       .attr('x', (d) => xFrameScale(d.from))
       .attr('y', (d) => yScale(this.scales.instrumentAnnotationHeaderScale(d.header)))
       .attr('width', (d) => xFrameScale(d.to - d.from))

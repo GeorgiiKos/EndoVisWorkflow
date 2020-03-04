@@ -72,9 +72,9 @@ export class AggregateDataComponent implements OnInit {
       .data((row) => {  // function evaluates data passed from rows
         return columns.map((column) => {
           switch (column) {
-            case ("Phase"):
+            case ('Phase'):
               return { column: column, value: row[column] };
-            case ("Percentage"):
+            case ('Percentage'):
               return { column: column, value: this.getPercentageAndDuration(row[column]) };
           }
         });

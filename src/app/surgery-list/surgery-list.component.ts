@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ascending, autoType, csvParse, descending } from 'd3';
 import { DataService } from '../services/data.service';
 import { SurgeryListItemComponent } from '../surgery-list-item/surgery-list-item.component';

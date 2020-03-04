@@ -1,5 +1,5 @@
 import { Component, Input, NgZone, OnInit } from '@angular/core';
-import { drag, range, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
+import { drag, scaleBand, scaleLinear, scaleTime, select } from 'd3';
 import { PointerService } from '../services/pointer.service';
 import { PositioningService } from '../services/positioning.service';
 import { ScaleService } from '../services/scale.service';
@@ -14,26 +14,26 @@ export class BarChartComponent implements OnInit {
   @Input() videoMetadata;
   @Input() phaseAnnotation;
 
-  constructor(private pointerService: PointerService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
+  constructor(private pointerService: PointerService, private pos: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
   ngOnInit() {
 
   }
 
   ngAfterViewInit() {
-    var svgElement = select(`#bar-chart-${this.videoMetadata.name}`).attr('height', this.positioning.barChartHeight);  // set height of the svg element
+    var svgElement = select(`#bar-chart-${this.videoMetadata.name}`).attr('height', this.pos.barChartHeight);  // set height of the svg element
     var svgWidth = parseFloat(svgElement.style('width'));  // get width of the svg element
-    var innerWidth = svgWidth - this.positioning.marginLeft - this.positioning.marginRight;  // calculate width of the bar
+    var innerWidth = svgWidth - this.pos.marginLeft - this.pos.marginRight;  // calculate width of the bar
 
     // create group for the graph and move it 
-    var group = svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`);
+    var group = svgElement.append('g').attr('transform', `translate(${this.pos.marginLeft}, 0)`);
 
     // get x scales
     var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);
     var xTimeScale = scaleTime().domain([0, this.videoMetadata.numFrames]).range([new Date(0), new Date(this.videoMetadata.duration)]);
 
     // move relative container to the right
-    select(`#relative-container-${this.videoMetadata.name}`).style('margin-left', `${this.positioning.marginLeft}px`);
+    select(`#relative-container-${this.videoMetadata.name}`).style('margin-left', `${this.pos.marginLeft}px`);
 
     this.drawPhaseBar(group, xFrameScale);
     this.drawPointer(group, svgElement, innerWidth, xFrameScale, xTimeScale);
@@ -42,7 +42,7 @@ export class BarChartComponent implements OnInit {
 
   private drawPhaseBar(group, xFrameScale) {
     // get y scale
-    var yScale = scaleBand().domain(['Phase']).range([this.positioning.barChartInnerHeight, 0]);
+    var yScale = scaleBand().domain(['Phase']).range([this.pos.barChartInnerHeight, 0]);
 
     var transformedData = this.transformPhaseAnnotation();
 
@@ -52,55 +52,50 @@ export class BarChartComponent implements OnInit {
       .attr('class', `tooltipBubble-${this.videoMetadata.name}`)
       .style('position', 'absolute')
       .style('left', '0px')
-      .style('top', `${this.positioning.barChartMarginTop - this.positioning.barChartTooltipBubbleHeight - this.positioning.barChartTooltipArrowHeight}px`)  // todo: write function
+      .style('top', `${this.pos.barChartMarginTop - this.pos.barChartTooltipBubbleHeight - this.pos.barChartTooltipArrowHeight}px`)  // todo: write function
       .style('opacity', 0)
       .style('background-color', 'lightgray')
       .style('border-radius', '0.25rem')
       .style('text-align', 'center')
-      .style('font-size', `${this.positioning.barChartTooltipBubbleFontSize}px`)
-      .style('width', `${this.positioning.barChartTooltipBubbleWidth}px`)
+      .style('font-size', `${this.pos.barChartTooltipBubbleFontSize}px`)
+      .style('width', `${this.pos.barChartTooltipBubbleWidth}px`)
 
     // add tooltip arrow
     var tooltipArrow = group.append('polygon')
-      .attr('points', `${0 - this.positioning.barChartTooltipArrowHeight / 2},${this.positioning.barChartMarginTop - this.positioning.barChartTooltipArrowHeight} ${this.positioning.barChartTooltipArrowHeight / 2},${this.positioning.barChartMarginTop - this.positioning.barChartTooltipArrowHeight} 0,${this.positioning.barChartMarginTop}`)
+      .attr('points', `${0 - this.pos.barChartTooltipArrowHeight / 2},${this.pos.barChartMarginTop - this.pos.barChartTooltipArrowHeight} ${this.pos.barChartTooltipArrowHeight / 2},${this.pos.barChartMarginTop - this.pos.barChartTooltipArrowHeight} 0,${this.pos.barChartMarginTop}`)
       .style('fill', 'lightgray')
       .attr('class', `arrow-${this.videoMetadata.name}`)
       .style('opacity', 0);
 
     // add bar
-    var pointsToArray = this.positioning.convertPointsToArray;
-    var arrayToPoints = this.positioning.convertArrayToPoints;
-    var tooltipBubbleWidth = this.positioning.barChartTooltipBubbleWidth;
-    var barChartTooltipArrowHeight = this.positioning.barChartTooltipArrowHeight;
-
     var phases = group.append('g').selectAll('rect')
       .data(transformedData)
       .enter().append('rect')
       .attr('x', (d) => { return xFrameScale(d.from); })
-      .attr('y', this.positioning.barChartMarginTop)
+      .attr('y', this.pos.barChartMarginTop)
       .attr('width', (d) => { return xFrameScale(d.to - d.from); })
       .attr('fill', (d) => { return this.scales.phaseAnnotationColorScale(d.phase); })
       .attr('height', yScale.bandwidth());
 
+    var marginTop = this.pos.barChartMarginTop;
+    var tooltipBubbleWidth = this.pos.barChartTooltipBubbleWidth;
+    var tooltipArrowHeight = this.pos.barChartTooltipArrowHeight;
+
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
-      phases.on("mouseover", function (d) {
-        select(this).style("opacity", .7);
+      phases.on('mouseover', function (d) {
+        select(this).style('opacity', .7);
         var position = xFrameScale(d.from) + xFrameScale(d.to - d.from) / 2; // calculate position to place tooltip
 
         // move tooltip bubble
         tooltipBubble.text(`Phase: ${d.phase}`).style('opacity', 1)
           .style('left', `${position - tooltipBubbleWidth / 2}px`);
 
-        // move tooltip arrow
-        var tipCoordinates = pointsToArray(tooltipArrow.attr('points'));
-        tipCoordinates[0][0] = position - barChartTooltipArrowHeight / 2;
-        tipCoordinates[1][0] = position + barChartTooltipArrowHeight / 2;
-        tipCoordinates[2][0] = position;
-        tooltipArrow.style('opacity', 1).attr('points', arrayToPoints(tipCoordinates));
+        tooltipArrow.style('opacity', 1)
+          .attr('points', `${position - tooltipArrowHeight / 2},${marginTop - tooltipArrowHeight} ${position + tooltipArrowHeight / 2},${marginTop - tooltipArrowHeight} ${position},${marginTop}`);
       })
-        .on("mouseout", function (d) {
-          select(this).style("opacity", 1);
+        .on('mouseout', function (d) {
+          select(this).style('opacity', 1);
           tooltipBubble.style('opacity', 0)
           tooltipArrow.style('opacity', 0)
         });
@@ -132,23 +127,23 @@ export class BarChartComponent implements OnInit {
     // add line
     var pointer = group.append('line')
       .attr('class', `pointer-${this.videoMetadata.name}`)
-      .attr("x1", 0)
-      .attr("y1", this.positioning.barChartMarginTop)
-      .attr("x2", 0)
-      .attr("y2", this.positioning.barChartHeight)
-      .attr("stroke-width", this.positioning.pointerWidth)
-      .attr("stroke", "gray");
+      .attr('x1', 0)
+      .attr('y1', this.pos.barChartMarginTop)
+      .attr('x2', 0)
+      .attr('y2', this.pos.barChartHeight)
+      .attr('stroke-width', this.pos.pointerWidth)
+      .attr('stroke', 'gray');
 
     // add image frame
     var imageFrame = select(`#relative-container-${this.videoMetadata.name}`)
       .append('div')
       .attr('class', `image-frame-${this.videoMetadata.name}`)
       .style('position', 'absolute')
-      .style('left', `${0 - (this.videoMetadata.frameWidth / 2 + this.positioning.barChartImageFramePadding)}px`)
-      .style('top', `${this.positioning.barChartMarginTop - this.videoMetadata.frameHeight - this.positioning.barChartImageFrameInfoHeight - this.positioning.barChartImageFramePadding}px`)
-      .style('padding-left', `${this.positioning.barChartImageFramePadding}px`)
-      .style('padding-right', `${this.positioning.barChartImageFramePadding}px`)
-      .style('padding-top', `${this.positioning.barChartImageFramePadding}px`)
+      .style('left', `${0 - (this.videoMetadata.frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
+      .style('top', `${this.pos.barChartMarginTop - this.videoMetadata.frameHeight - this.pos.barChartImageFrameInfoHeight - this.pos.barChartImageFramePadding}px`)
+      .style('padding-left', `${this.pos.barChartImageFramePadding}px`)
+      .style('padding-right', `${this.pos.barChartImageFramePadding}px`)
+      .style('padding-top', `${this.pos.barChartImageFramePadding}px`)
       .style('background-color', 'gray')
       .style('border-radius', '.25rem')
 
@@ -162,15 +157,15 @@ export class BarChartComponent implements OnInit {
 
     // add image frame info section
     var imageFrameInfo = imageFrame.append('div')
-      .style('font-size', `${this.positioning.barChartImageFrameInfoFontSize}px`)
+      .style('font-size', `${this.pos.barChartImageFrameInfoFontSize}px`)
       .style('text-align', 'center')
-      .style('height', `${this.positioning.barChartImageFrameInfoHeight}px`)
-      .text('0 | 00:00:00')
+      .style('height', `${this.pos.barChartImageFrameInfoHeight}px`)
+      .text(`0 | 00:00:00 | ${this.phaseAnnotation[0].phase}`)
       .attr('class', `image-frame-info-${this.videoMetadata.name}`);
 
     // add image frame arrow
     var imageFrameArrow = group.append('polygon')
-      .attr('points', `${0 - this.positioning.barChartImageFrameArrowHeight / 2},${this.positioning.barChartMarginTop} ${this.positioning.barChartImageFrameArrowHeight / 2},${this.positioning.barChartMarginTop} 0,${this.positioning.barChartMarginTop + this.positioning.barChartImageFrameArrowHeight}`)
+      .attr('points', `${0 - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} 0,${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
       .style('fill', 'gray')
       .attr('class', `image-frame-arrow-${this.videoMetadata.name}`);
 

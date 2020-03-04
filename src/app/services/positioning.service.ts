@@ -41,31 +41,4 @@ export class PositioningService {
   get chartAreaHeight() {
     return sum(this.chartAreaInnerHeight) + sum(this.chartAreaMarginTop) + sum(this.chartAreaMarginBottom);
   }
-
-  // this method calculates position for each graph in the chart area
-  public calcChartAreaYPos(index) {
-    var sum = 0;
-    for (var i = 0; i < index; i++) {
-      sum += this.chartAreaInnerHeight[i] + this.chartAreaMarginBottom[i];
-    }
-    for (var i = 0; i < index + 1; i++) {
-      sum += this.chartAreaMarginTop[i];
-    }
-    return sum;
-  }
-
-  // this method converts polygon points to array
-  public convertPointsToArray(points) {
-    return points.split(' ')
-      .map((e) => e.split(','))
-      .map((e) => e.map((v) => parseFloat(v)));
-  }
-
-  // this method converts array to polygon points
-  public convertArrayToPoints(array) {
-    return array.map(function (d) {
-      return d.join(",");
-    }).join(" ")
-  }
-
 }

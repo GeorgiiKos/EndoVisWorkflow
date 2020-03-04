@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { autoType, csvParse, csvParseRows } from 'd3';
 import { DataService } from '../services/data.service';
 

@@ -17,18 +17,18 @@ export class ChartAreaComponent implements OnInit {
   @Input() instrumentAnnotation;
   @Input() phaseAnnotation;
 
-  constructor(public pointerService: PointerService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
+  constructor(public pointerService: PointerService, private pos: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
   ngOnInit() {
 
   }
 
   ngAfterViewInit() {
-    var svgElement = select('#chart-area-' + this.videoMetadata.name).attr('height', this.positioning.chartAreaHeight);  // set height of svg container
-    var globalGroup = svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`);
+    var svgElement = select('#chart-area-' + this.videoMetadata.name).attr('height', this.pos.chartAreaHeight);  // set height of svg container
+    var globalGroup = svgElement.append('g').attr('transform', `translate(${this.pos.marginLeft}, 0)`);
     var svgWidth = parseFloat(svgElement.style('width'));  // get svg width
 
-    var innerWidth = svgWidth - this.positioning.marginLeft - this.positioning.marginRight;  // calculate width of a single graph
+    var innerWidth = svgWidth - this.pos.marginLeft - this.pos.marginRight;  // calculate width of a single graph
 
     // get x scales
     var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);
@@ -62,14 +62,14 @@ export class ChartAreaComponent implements OnInit {
 
   private drawSingleDeviceDataGraph(globalGroup, innerWidth, xFrameScale, i, range, headers, colorScale) {
     var group = globalGroup.append('g')
-      .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(i)})`)
+      .attr('transform', `translate(0, ${this.calcChartAreaYPos(i)})`)
       .attr('class', `content-${this.videoMetadata.name}`);
-    var yScale = scaleLinear().domain(range).range([this.positioning.chartAreaInnerHeight[i], 0])
+    var yScale = scaleLinear().domain(range).range([this.pos.chartAreaInnerHeight[i], 0])
 
     // add x-axis
     group.append('g')
       .attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[i]})`)
+      .attr('transform', `translate(0, ${this.pos.chartAreaInnerHeight[i]})`)
       .call(axisBottom(xFrameScale));
 
     // add grid lines
@@ -77,7 +77,7 @@ export class ChartAreaComponent implements OnInit {
       .attr('class', 'grid')
       .call(axisLeft(yScale)
         .tickSize(-innerWidth)
-        .ticks(this.positioning.chartAreaTicks[i])
+        .ticks(this.pos.chartAreaTicks[i])
         .tickFormat(''))
       .call(g => g.select('.domain').remove())
       .call(g => g.select('line').remove())  // remove first line
@@ -87,7 +87,7 @@ export class ChartAreaComponent implements OnInit {
     // add y-axis
     group.append('g')
       .attr('class', 'y-axis')
-      .call(axisLeft(yScale).ticks(this.positioning.chartAreaTicks[i]));
+      .call(axisLeft(yScale).ticks(this.pos.chartAreaTicks[i]));
 
     var nestedData = headers.map((header) =>
       ({
@@ -117,17 +117,17 @@ export class ChartAreaComponent implements OnInit {
 
   private drawInstrumentAnnotationGraph(globalGroup, innerWidth, xFrameScale) {
     // get scale functions
-    var yScale = scaleBand().domain(this.scales.instrumentAnnotationHeaderScale.range()).range([this.positioning.chartAreaInnerHeight[3], 0])
+    var yScale = scaleBand().domain(this.scales.instrumentAnnotationHeaderScale.range()).range([this.pos.chartAreaInnerHeight[3], 0])
 
     // create group for the graph and move it 
     var group = globalGroup.append('g')
-      .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(3)})`)
+      .attr('transform', `translate(0, ${this.calcChartAreaYPos(3)})`)
       .attr('class', `content-${this.videoMetadata.name}`);
 
     // add x-axis
     group.append('g')
       .attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[3]})`)
+      .attr('transform', `translate(0, ${this.pos.chartAreaInnerHeight[3]})`)
       .call(axisBottom(xFrameScale));
 
     // add grid lines
@@ -135,7 +135,7 @@ export class ChartAreaComponent implements OnInit {
       .attr('class', 'grid')
       .call(axisLeft(yScale)
         .tickSize(-innerWidth)
-        .ticks(this.positioning.chartAreaTicks[3])
+        .ticks(this.pos.chartAreaTicks[3])
         .tickFormat(''))
       .call(g => g.select('.domain').remove())
       .call(g => g.select('line').remove())  // remove first line
@@ -167,12 +167,12 @@ export class ChartAreaComponent implements OnInit {
     var xPos = parseFloat(select(`.pointer-${this.videoMetadata.name}`).attr('x1'));
     var pointer = globalGroup.append('line')
       .attr('class', `pointer-${this.videoMetadata.name}`)
-      .attr("x1", xPos)
-      .attr("y1", 0)
-      .attr("x2", xPos)
-      .attr("y2", this.positioning.chartAreaHeight)
-      .attr("stroke-width", this.positioning.pointerWidth)
-      .attr("stroke", "gray");
+      .attr('x1', xPos)
+      .attr('y1', 0)
+      .attr('x2', xPos)
+      .attr('y2', this.pos.chartAreaHeight)
+      .attr('stroke-width', this.pos.pointerWidth)
+      .attr('stroke', 'gray');
 
     // initial instrument highlighting
     var frameNr = Math.round(xFrameScale.invert(xPos));  // calculate frame number
@@ -213,6 +213,18 @@ export class ChartAreaComponent implements OnInit {
       }
     }
     return result
+  }
+
+  // this method calculates position for each graph
+  public calcChartAreaYPos(index) {
+    var sum = 0;
+    for (var i = 0; i < index; i++) {
+      sum += this.pos.chartAreaInnerHeight[i] + this.pos.chartAreaMarginBottom[i];
+    }
+    for (var i = 0; i < index + 1; i++) {
+      sum += this.pos.chartAreaMarginTop[i];
+    }
+    return sum;
   }
 
   // mean downsampling

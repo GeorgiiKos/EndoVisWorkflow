@@ -36,7 +36,7 @@ if not os.path.exists(output_folder):
 # add csv header
 with open(output_folder + '/VideoMetadata.csv', 'w', newline='') as csv_file:
     prop_writer = csv.writer(csv_file, delimiter=',', quotechar='"')
-    prop_writer.writerow(['name','type','numFrames','fps','duration','frameWidth','frameHeight','frameSamplingRate'])
+    prop_writer.writerow(['name','numFrames','fps','duration','frameWidth','frameHeight','frameSamplingRate'])
 
 # iterate over video files
 for path in video_files:
@@ -44,15 +44,6 @@ for path in video_files:
     video_name = os.path.basename(path)
     video_name = re.search(regex, path).group(1)
     print('########## Processing {} ##########'.format(video_name))
-    
-    # TODO: remove
-    surgery_type = None
-    if 'Prokto' in video_name:
-        surgery_type = 'Proctocolectomy'
-    elif 'Sigma' in video_name:
-        surgery_type = 'Sigmoid resection'
-    elif 'Rektum' in video_name:
-        surgery_type = 'Rectal resection'
     
     # capture video from file
     cap = cv2.VideoCapture(path)
@@ -77,7 +68,7 @@ for path in video_files:
     # write data to a csv file
     with open(output_folder + '/VideoMetadata.csv', 'a', newline='') as csv_file:
         prop_writer = csv.writer(csv_file, delimiter=',', quotechar='"')
-        prop_writer.writerow([video_name, surgery_type, num_frames, fps, duration, frame_width, frame_height, frame_sampling_rate])
+        prop_writer.writerow([video_name, num_frames, fps, duration, frame_width, frame_height, frame_sampling_rate])
         
 print()
 print('Finished successfully')

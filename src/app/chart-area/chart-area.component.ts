@@ -48,16 +48,9 @@ export class ChartAreaComponent implements OnInit {
   }
 
   private drawInstrumentAnnotationGraph() {
-
-    var labels = ['Grasper', 'Harmonic Scalpel', 'J-hook', 'Ligasure', 'Scissors', 'Stapler', 'Aspirator',
-      'Swapholder', 'Silicone Drain', 'Clipper', 'I-Hook', 'Needle Holder'];
-
     // get scale functions
     var xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
-    var yScale = scaleBand().domain(labels).range([this.positioning.chartAreaInnerHeight[3], 0])
-    var headerScale = scaleOrdinal().domain(this.instrumentAnnotation.columns.slice(1)).range(labels)
-    var colorScale = scaleOrdinal().domain(labels)
-      .range(["#ff58ab", "#3c5b16", "#5e38b4", "#ff5a09", "#0191bb", "#ff5556", "#91d4ba", "#cd0071", "#ffb555", "#c3baff", "#784543", "#ffabc0"])
+    var yScale = scaleBand().domain(this.scales.instrumentAnnotationHeaderScale.range()).range([this.positioning.chartAreaInnerHeight[3], 0])
 
     // create group for the graph and move it 
     var group = this.chartAreaGroup.append('g')
@@ -82,10 +75,11 @@ export class ChartAreaComponent implements OnInit {
     group.append('g').selectAll('rect')
       .data(transformedData)
       .enter().append('rect')
-      .attr('x', function (d) { return xFramesScale(d.from); })
-      .attr('y', function (d) { return yScale(headerScale(d.header)); })
-      .attr('width', function (d) { return xFramesScale(d.to - d.from); })
-      .attr('fill', function (d) { return colorScale(headerScale(d.header)); })
+      .attr('class', `instrument-${this.videoMetadata.name}`)
+      .attr('x', (d) => xFramesScale(d.from))
+      .attr('y', (d) => yScale(this.scales.instrumentAnnotationHeaderScale(d.header)))
+      .attr('width', (d) => xFramesScale(d.to - d.from))
+      .attr('fill', (d) => this.scales.instrumentAnnotationColorScale(d.header))
       .attr('height', yScale.bandwidth());
 
     // group.append('g')

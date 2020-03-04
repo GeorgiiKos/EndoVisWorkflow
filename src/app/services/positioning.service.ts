@@ -42,13 +42,27 @@ export class PositioningService {
     return sum(this.chartAreaInnerHeight) + (this.chartAreaMarginTop * this.chartAreaInnerHeight.length) + (this.chartAreaMarginBottom * this.chartAreaInnerHeight.length);
   }
 
-  // todo: remove from here
   public calcChartAreaYPos(index) {
     var sum = 0;
     for (var i = 0; i < index; i++) {
       sum += this.chartAreaInnerHeight[i];
     }
     return this.chartAreaMarginTop * (index + 1) + this.chartAreaMarginBottom * index + sum;
+  }
+
+  // this method converts polygon points to array
+  public convertPointsToArray(points) {
+    console.log(points)
+    return points.split(' ')
+      .map((e) => e.split(','))
+      .map((e) => e.map((v) => parseFloat(v)));
+  }
+
+  // this method converts array to polygon points
+  public convertArrayToPoints(array) {
+    return array.map(function (d) {
+      return d.join(",");
+    }).join(" ")
   }
 
 }

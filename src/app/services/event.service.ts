@@ -14,7 +14,7 @@ export class EventService {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
     var imageFrame = selectAll(`.image-frame-${name}`);
-    var imageFrameTip = selectAll(`.image-frame-tip-${name}`);
+    var imageFrameArrow = selectAll(`.image-frame-arrow-${name}`);
     var imageFrameInfo = selectAll(`.image-frame-info-${name}`);
 
     var xMouse = mouse(group.node())[0];  // get x mouse position relative to group element
@@ -23,7 +23,7 @@ export class EventService {
     var frameNr = Math.round(xFramesScale.invert(xUpdated));
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
     imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
-    imageFrameTip.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
+    imageFrameArrow.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
     var time = xTimeScale.invert(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
@@ -32,7 +32,7 @@ export class EventService {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
     var imageFrame = selectAll(`.image-frame-${name}`);
-    var imageFrameTip = selectAll(`.image-frame-tip-${name}`);
+    var imageFrameArrow = selectAll(`.image-frame-arrow-${name}`);
     var imageFrameInfo = selectAll(`.image-frame-info-${name}`);
 
     var xPos = parseFloat(pointers.attr('x1'));
@@ -42,7 +42,7 @@ export class EventService {
     var frameNr = Math.round(xFramesScale.invert(xUpdated));
     image.attr('src', this.getImageUrl(name, frameNr));  // update image
     imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`)
-    imageFrameTip.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
+    imageFrameArrow.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`)
     var time = xTimeScale.invert(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
+import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
 import { PositioningService } from '../services/positioning.service';
@@ -33,12 +33,12 @@ export class ChartAreaComponent implements OnInit {
     var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);
     var xTimeScale = scaleTime().domain([0, this.videoMetadata.numFrames]).range([new Date(0), new Date(this.videoMetadata.duration)]);
 
-    this.drawDeviceDataGraph(globalGroup, xFrameScale);
+    this.drawDeviceDataGraph(globalGroup, innerWidth, xFrameScale);
     this.drawInstrumentAnnotationGraph(globalGroup, xFrameScale);
     this.drawPointer(globalGroup, svgElement, innerWidth, xFrameScale, xTimeScale);
   }
 
-  private drawDeviceDataGraph(globalGroup, xFrameScale) {
+  private drawDeviceDataGraph(globalGroup, innerWidth, xFrameScale) {
     var graphData = [
       {
         range: [-1, 300],
@@ -53,18 +53,13 @@ export class ChartAreaComponent implements OnInit {
         headers: ['deviceOn', 'allLightsOff', 'whiteBalance']
       }
     ]
-    var allHeaders = ['currentGasFlowRate', 'targetGasFlowRate', ' currentGasPressure', 'targetGasPressure', 'usedGasVolume', 'gasSupplyPressure', 'deviceOn', 'allLightsOff', 'intensityLight1', 'intensityLight2', 'intensity', 'whiteBalance', 'gains', 'exposureIndex']
-
-    // var colorScale = scaleOrdinal()
-    //   .domain(allHeaders)
-    //   .range(['red', 'blue', 'green'])
 
     graphData.forEach((element, i) => {
-      this.drawSingleDeviceDataGraph(globalGroup, xFrameScale, i, element.range, element.headers, this.scales.deviceDataColorScale)
+      this.drawSingleDeviceDataGraph(globalGroup, innerWidth, xFrameScale, i, element.range, element.headers, this.scales.deviceDataColorScale)
     });
   }
 
-  private drawSingleDeviceDataGraph(globalGroup, xFrameScale, i, range, headers, colorScale) {
+  private drawSingleDeviceDataGraph(globalGroup, innerWidth, xFrameScale, i, range, headers, colorScale) {
     var group = globalGroup.append('g')
       .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(i)})`)
       .attr('class', `content-${this.videoMetadata.name}`);
@@ -80,6 +75,18 @@ export class ChartAreaComponent implements OnInit {
     group.append('g')
       .attr('class', 'y-axis')
       .call(axisLeft(yScale).ticks(this.positioning.chartAreaTicks[i]));
+
+    // add grid lines
+    group.append('g')
+      .attr('class', 'grid')
+      .call(axisLeft(yScale)
+        .tickSize(-innerWidth)
+        .ticks(this.positioning.chartAreaTicks[i])
+        .tickFormat(''))
+      .call(g => g.select('.domain').remove())
+      .call(g => g.select('line').remove())
+      .call(g => g.selectAll('line').style('stroke', '#ededed'));
+
 
     var nestedData = headers.map((header) =>
       ({

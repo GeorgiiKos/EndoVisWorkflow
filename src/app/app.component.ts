@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
-import { SurgerylistComponent } from './surgerylist/surgerylist.component';
-import { ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { SurgeryListComponent } from './surgery-list/surgery-list.component';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +8,11 @@ import { ViewChild } from '@angular/core';
 })
 export class AppComponent {
   title = 'EndoVisWorkflow';
-  @ViewChild(SurgerylistComponent, { static: false }) child: SurgerylistComponent;
 
-  public sortSurgeries(name: string, asc: boolean) {
-    this.child.sortSurgeries(name, asc);
+  @ViewChild(SurgeryListComponent, { static: false })
+  private child: SurgeryListComponent;
+
+  public sortMetadata(column: string, asc: boolean) {
+    this.child.sortMetadata(column, asc);
   }
 }

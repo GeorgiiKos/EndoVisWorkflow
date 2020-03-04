@@ -1,0 +1,114 @@
+<table [id]="'selection-table-' + videoMetadata.name" class="table table-sm">
+    <thead>
+        <tr>
+            <th class="border-top-0">Thermoflator</th>
+            <th class="border-top-0">OR lights</th>
+            <th class="border-top-0">Endoscopic light source</th>
+            <th class="border-top-0">Endoscope</th>
+            <th class="border-top-0">Options</th>
+        </tr>
+    </thead>
+    <tbody style="font-size: 0.8rem;">
+        <tr>
+            <td>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'currentGasFlowRate-' + videoMetadata.name" checked>
+                        Current gas flow rate
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'targetGasFlowRate-' + videoMetadata.name">
+                        Target gas flow rate
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'currentGasPressure-' + videoMetadata.name">
+                        Current gas pressure
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'targetGasPressure-' + videoMetadata.name">
+                        Target gas pressure
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'usedGasVolume-' + videoMetadata.name">
+                        Used gas volume
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'gasSupplyPressure-' + videoMetadata.name">
+                        Gas supply pressure
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'deviceOn-' + videoMetadata.name">
+                        Device on?
+                    </label>
+                </div>
+            </td>
+            <td>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'allLightsOff-' + videoMetadata.name">
+                        All lights off?
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'intensityLight1-' + videoMetadata.name">
+                        Intensity light 1
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'intensityLight2-' + videoMetadata.name">
+                        Intensity light 2
+                    </label>
+                </div>
+            </td>
+            <td>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'intensity-' + videoMetadata.name">
+                        Intensity
+                    </label>
+                </div>
+            </td>
+            <td>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'whiteBalance-' + videoMetadata.name">
+                        White balance
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'gains-' + videoMetadata.name">
+                        Gains
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" [value]="'exposureIndex-' + videoMetadata.name">
+                        Exposure index
+                    </label>
+                </div>
+            </td>
+            <td>
+                <div class="form-group">
+                    <label for="lineWidth">Line width</label>
+                    <input type="range" min="1" max="3" step="0.2" value="1" class="form-control-range"
+                        [id]="'lineWidth-' + videoMetadata.name">
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

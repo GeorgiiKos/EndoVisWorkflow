@@ -1,0 +1,6 @@
+{
+    "csvLocation": "Path to the folder containing csv files (Example: C:/Users/[Username]/Documents/ProjectIII_Material_ohneVideos)",
+    "videoLocation": "Path to the folder containing video files (Example: C:/Users/[Username]/Downloads)",
+    "frameSamplingRate": 500,
+    "downscaleFactor": 10
+}

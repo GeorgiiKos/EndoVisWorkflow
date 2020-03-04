@@ -16,16 +16,16 @@ export class ChartAreaComponent implements OnInit {
   @Input() deviceData;
   @Input() instrumentAnnotation;
 
-  private xFramesScale;
-  private xTimeScale;
+  // private xFramesScale;
+  // private xTimeScale;
 
-  private svgWidth;
-  private innerWidth;
+  // private svgWidth;
+  // private innerWidth;
 
 
-  // positioning variables for chart area
-  private svgElement;
-  private chartAreaGroup;
+  // // positioning variables for chart area
+  // private svgElement;
+  // private chartAreaGroup;
 
   constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService) { }
 
@@ -34,63 +34,22 @@ export class ChartAreaComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.svgElement = select('#chart-area-' + this.videoMetadata.name).attr('height', this.positioning.chartAreaHeight);
-    this.chartAreaGroup = this.svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`);
-    this.svgWidth = parseFloat(this.svgElement.style('width'));
+    var svgElement = select('#chart-area-' + this.videoMetadata.name).attr('height', this.positioning.chartAreaHeight);  // set height of svg container
+    var globalGroup = svgElement.append('g').attr('transform', `translate(${this.positioning.marginLeft}, 0)`);
+    var svgWidth = parseFloat(svgElement.style('width'));  // get svg width
 
-    this.innerWidth = this.svgWidth - this.positioning.marginLeft - this.positioning.marginRight;
+    var innerWidth = svgWidth - this.positioning.marginLeft - this.positioning.marginRight;  // calculate width of a single graph
 
-    this.xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);  // x scale is same for all charts
-    this.xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
-    this.drawDeviceDataGraph();
-    this.drawInstrumentAnnotationGraph();
-    this.drawPointer();
+    // get x scales
+    var xFrameScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, innerWidth]);
+    var xTimeScale = scaleTime().domain([new Date(0), new Date(this.videoMetadata.duration)]).range([0, this.videoMetadata.numFrames]);
+
+    this.drawDeviceDataGraph(globalGroup, xFrameScale);
+    this.drawInstrumentAnnotationGraph(globalGroup, xFrameScale);
+    this.drawPointer(globalGroup, svgElement, innerWidth, xFrameScale, xTimeScale);
   }
 
-  private drawInstrumentAnnotationGraph() {
-    // get scale functions
-    var xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
-    var yScale = scaleBand().domain(this.scales.instrumentAnnotationHeaderScale.range()).range([this.positioning.chartAreaInnerHeight[3], 0])
-
-    // create group for the graph and move it 
-    var group = this.chartAreaGroup.append('g')
-      .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(3)})`)
-      .attr('class', `content-${this.videoMetadata.name}`);
-
-    // add x-axis
-    group.append('g')
-      .attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[3]})`)
-      .call(axisBottom(xFramesScale));
-
-    // add y-axis
-    group.append('g')
-      .attr('class', 'y-axis')
-      .call(axisLeft(yScale));
-
-    // transform data into a better representation
-    var transformedData = this.transformInstrumentAnnotation(this.instrumentAnnotation)
-
-    // add bars
-    group.append('g').selectAll('rect')
-      .data(transformedData)
-      .enter().append('rect')
-      .attr('class', `instrument-${this.videoMetadata.name}`)
-      .attr('x', (d) => xFramesScale(d.from))
-      .attr('y', (d) => yScale(this.scales.instrumentAnnotationHeaderScale(d.header)))
-      .attr('width', (d) => xFramesScale(d.to - d.from))
-      .attr('fill', (d) => this.scales.instrumentAnnotationColorScale(d.header))
-      .attr('height', yScale.bandwidth());
-
-    // group.append('g')
-    //   .attr('class', 'grid')
-    //   .call(axisLeft(yScale).ticks(13)
-    //     .tickSize(-svgWidth)
-    //     .tickFormat('')
-    //   )
-  }
-
-  private drawDeviceDataGraph() {
+  private drawDeviceDataGraph(globalGroup, xFrameScale) {
     var graphData = [
       {
         range: [-1, 300],
@@ -112,22 +71,21 @@ export class ChartAreaComponent implements OnInit {
     //   .range(['red', 'blue', 'green'])
 
     graphData.forEach((element, i) => {
-      this.drawSingleDeviceDataGraph(i, element.range, element.headers, this.scales.deviceDataColorScale)
+      this.drawSingleDeviceDataGraph(globalGroup, xFrameScale, i, element.range, element.headers, this.scales.deviceDataColorScale)
     });
   }
 
-  private drawSingleDeviceDataGraph(i, range, headers, colorScale) {
-    var group = this.chartAreaGroup.append('g')
+  private drawSingleDeviceDataGraph(globalGroup, xFrameScale, i, range, headers, colorScale) {
+    var group = globalGroup.append('g')
       .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(i)})`)
       .attr('class', `content-${this.videoMetadata.name}`);
-    var xFramesScale = scaleLinear().domain([0, this.videoMetadata.numFrames]).range([0, this.innerWidth]);
     var yScale = scaleLinear().domain(range).range([this.positioning.chartAreaInnerHeight[i], 0])
 
     // add x-axis
     group.append('g')
       .attr('class', 'x-axis')
       .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[i]})`)
-      .call(axisBottom(xFramesScale));
+      .call(axisBottom(xFrameScale));
 
     // add y-axis
     group.append('g')
@@ -142,7 +100,7 @@ export class ChartAreaComponent implements OnInit {
 
     // draw line
     var lineGenerator = line()
-      .x(function (d, i) { return xFramesScale(d.frame); })
+      .x(function (d, i) { return xFrameScale(d.frame); })
       .y(function (d, i) { return yScale(d.value); })
       .curve(curveBasis);  // curve interpolation
 
@@ -160,7 +118,65 @@ export class ChartAreaComponent implements OnInit {
     paths.filter((d) => d.header !== 'currentGasFlowRate').attr('visibility', 'hidden')
   }
 
+  private drawInstrumentAnnotationGraph(globalGroup, xFrameScale) {
+    // get scale functions
+    var yScale = scaleBand().domain(this.scales.instrumentAnnotationHeaderScale.range()).range([this.positioning.chartAreaInnerHeight[3], 0])
 
+    // create group for the graph and move it 
+    var group = globalGroup.append('g')
+      .attr('transform', `translate(0, ${this.positioning.calcChartAreaYPos(3)})`)
+      .attr('class', `content-${this.videoMetadata.name}`);
+
+    // add x-axis
+    group.append('g')
+      .attr('class', 'x-axis')
+      .attr('transform', `translate(0, ${this.positioning.chartAreaInnerHeight[3]})`)
+      .call(axisBottom(xFrameScale));
+
+    // add y-axis
+    group.append('g')
+      .attr('class', 'y-axis')
+      .call(axisLeft(yScale));
+
+    // transform data into a better representation
+    var transformedData = this.transformInstrumentAnnotation(this.instrumentAnnotation)
+
+    // add bars
+    group.append('g').selectAll('rect')
+      .data(transformedData)
+      .enter().append('rect')
+      .attr('class', `instrument-${this.videoMetadata.name}`)
+      .attr('x', (d) => xFrameScale(d.from))
+      .attr('y', (d) => yScale(this.scales.instrumentAnnotationHeaderScale(d.header)))
+      .attr('width', (d) => xFrameScale(d.to - d.from))
+      .attr('fill', (d) => this.scales.instrumentAnnotationColorScale(d.header))
+      .attr('height', yScale.bandwidth());
+
+    // group.append('g')
+    //   .attr('class', 'grid')
+    //   .call(axisLeft(yScale).ticks(13)
+    //     .tickSize(-svgWidth)
+    //     .tickFormat('')
+    //   )
+  }
+
+  private drawPointer(globalGroup, svgElement, innerWidth, xFrameScale, xTimeScale) {
+    var xPos = select(`.pointer-${this.videoMetadata.name}`).attr('x1');
+    var pointer = globalGroup.append('line')
+      .attr('class', `pointer-${this.videoMetadata.name}`)
+      .attr("x1", xPos)
+      .attr("y1", 0)
+      .attr("x2", xPos)
+      .attr("y2", this.positioning.chartAreaHeight)
+      .attr("stroke-width", this.positioning.pointerWidth)
+      .attr("stroke", "gray");
+
+    // add drag behavior for pointer element
+    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+
+    // add click behavior for svg element
+    svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+  }
 
   // TODO: maybe it is possible to do it with d3?
   private transformInstrumentAnnotation(data) {
@@ -186,7 +202,6 @@ export class ChartAreaComponent implements OnInit {
         previousFrameNr = row['Frame']
       }
     }
-    console.log(result)
     return result
   }
 
@@ -216,25 +231,5 @@ export class ChartAreaComponent implements OnInit {
     var result = sampler(data);
     return result;
   }
-
-  private drawPointer() {
-    var xPos = select(`.pointer-${this.videoMetadata.name}`).attr('x1');
-    var pointer = this.chartAreaGroup.append('line')
-      .attr('class', `pointer-${this.videoMetadata.name}`)
-      .attr("x1", xPos)
-      .attr("y1", 0)
-      .attr("x2", xPos)
-      .attr("y2", this.positioning.chartAreaHeight)
-      .attr("stroke-width", this.positioning.pointerWidth)
-      .attr("stroke", "gray");
-
-    // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, this.chartAreaGroup, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale)));
-
-    // add click behavior for svg element
-    this.svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, this.chartAreaGroup, this.innerWidth, this.videoMetadata.frameWidth, this.xFramesScale, this.xTimeScale));
-  }
-
-
 
 }

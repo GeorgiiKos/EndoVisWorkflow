@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, ComponentRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { autoType, csvParse, csvParseRows } from 'd3';
 import { DataService } from '../services/data.service';
 
@@ -6,7 +6,6 @@ import { DataService } from '../services/data.service';
 @Component({
   selector: 'app-surgery-list-item',
   templateUrl: './surgery-list-item.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./surgery-list-item.component.css']
 })
 export class SurgeryListItemComponent implements OnInit {
@@ -14,15 +13,14 @@ export class SurgeryListItemComponent implements OnInit {
   public cardExpanded = false;
 
   @Input() videoMetadata;
-  public duration: string;
+  public duration;
   public phaseAnnotation;
   public deviceData;
   public instrumentAnnotation;
 
-  constructor(private dataService: DataService, private cdr: ChangeDetectorRef) { }
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
-    // this.cdr.detectChanges()
     this.displayDuration();
     this.dataService.getPhaseAnnotation(this.videoMetadata.name)
       .subscribe(response => {
@@ -32,8 +30,7 @@ export class SurgeryListItemComponent implements OnInit {
             phase: parseInt(data[1])
           }
         });
-        this.cdr.detectChanges()
-      })
+      });
   }
 
   private loadDeviceDataAndInstrumentAnnotation() {
@@ -57,14 +54,11 @@ export class SurgeryListItemComponent implements OnInit {
           exposureIndex: parseInt(data[14])
         }
       });
-      this.cdr.detectChanges()
-    })
+    });
 
     this.dataService.getInstrumentAnnotation(this.videoMetadata.name).subscribe(response => {
       this.instrumentAnnotation = csvParse(response, autoType)
-      this.cdr.detectChanges()
-    })
-
+    });
   }
 
   private displayDuration() {
@@ -84,7 +78,6 @@ export class SurgeryListItemComponent implements OnInit {
     } else {
       this.cardExpanded = false;
     }
-    // this.cdr.detectChanges()
   }
 
 }

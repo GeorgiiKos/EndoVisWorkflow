@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, NgZone } from '@angular/core';
 import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
@@ -16,7 +16,7 @@ export class ChartAreaComponent implements OnInit {
   @Input() deviceData;
   @Input() instrumentAnnotation;
 
-  constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService) { }
+  constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
   ngOnInit() {
 
@@ -177,12 +177,15 @@ export class ChartAreaComponent implements OnInit {
       .attr("y2", this.positioning.chartAreaHeight)
       .attr("stroke-width", this.positioning.pointerWidth)
       .attr("stroke", "gray");
+    
+    // add event listeners outside angular change detection zone
+    this.zone.runOutsideAngular(() => {
+      // add drag behavior for pointer element
+      pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
 
-    // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
-
-    // add click behavior for svg element
-    svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+      // add click behavior for svg element
+      svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+    });
   }
 
   // TODO: maybe it is possible to do it with d3?

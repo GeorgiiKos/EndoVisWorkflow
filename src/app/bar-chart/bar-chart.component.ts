@@ -14,7 +14,7 @@ export class BarChartComponent implements OnInit {
   @Input() videoMetadata;
   @Input() phaseAnnotation;
 
-  constructor(private eventService: EventService, private zone: NgZone, private positioning: PositioningService, private scales: ScaleService) { }
+  constructor(private eventService: EventService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
   ngOnInit() {
 
@@ -73,15 +73,18 @@ export class BarChartComponent implements OnInit {
     var tooltipBubbleWidth = this.positioning.barChartTooltipBubbleWidth;
     var barChartTooltipArrowHeight = this.positioning.barChartTooltipArrowHeight;
 
-    group.append('g').selectAll('rect')
+    var phases = group.append('g').selectAll('rect')
       .data(transformedData)
       .enter().append('rect')
       .attr('x', (d) => { return xFrameScale(d.from); })
       .attr('y', this.positioning.barChartMarginTop)
       .attr('width', (d) => { return xFrameScale(d.to - d.from); })
       .attr('fill', (d) => { return this.scales.phaseAnnotationColorScale(d.phase); })
-      .attr('height', yScale.bandwidth())
-      .on("mouseover", function (d) {
+      .attr('height', yScale.bandwidth());
+
+    // add event listeners outside angular change detection zone
+    this.zone.runOutsideAngular(() => {
+      phases.on("mouseover", function (d) {
         select(this).style("opacity", .7);
         var position = xFrameScale(d.from) + xFrameScale(d.to - d.from) / 2; // calculate position to place tooltip
 
@@ -96,11 +99,12 @@ export class BarChartComponent implements OnInit {
         tipCoordinates[2][0] = position;
         tooltipArrow.style('opacity', 1).attr('points', arrayToPoints(tipCoordinates));
       })
-      .on("mouseout", function (d) {
-        select(this).style("opacity", 1);
-        tooltipBubble.style('opacity', 0)
-        tooltipArrow.style('opacity', 0)
-      });
+        .on("mouseout", function (d) {
+          select(this).style("opacity", 1);
+          tooltipBubble.style('opacity', 0)
+          tooltipArrow.style('opacity', 0)
+        });
+    });
   }
 
   // TODO: maybe it is possible to do it with d3?
@@ -170,12 +174,15 @@ export class BarChartComponent implements OnInit {
       .style('fill', 'gray')
       .attr('class', `image-frame-arrow-${this.videoMetadata.name}`);
 
-    // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
-    imageFrameArrow.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+    // add event listeners outside angular change detection zone
+    this.zone.runOutsideAngular(() => {
+      // add drag behavior for pointer element
+      pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+      imageFrameArrow.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
 
-    // add click behavior for svg element
-    svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+      // add click behavior for svg element
+      svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+    });
   }
 
 }

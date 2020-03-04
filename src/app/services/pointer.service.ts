@@ -6,7 +6,7 @@ import { ScaleService } from './scale.service';
 @Injectable({
   providedIn: 'root'
 })
-export class EventService {
+export class PointerService {
 
   constructor(private pos: PositioningService, private scales: ScaleService) { }
 

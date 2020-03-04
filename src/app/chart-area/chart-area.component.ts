@@ -1,7 +1,7 @@
 import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
-import { EventService } from '../services/event.service';
+import { PointerService } from '../services/pointer.service';
 import { PositioningService } from '../services/positioning.service';
 import { ScaleService } from '../services/scale.service';
 
@@ -17,7 +17,7 @@ export class ChartAreaComponent implements OnInit {
   @Input() instrumentAnnotation;
   @Input() phaseAnnotation;
 
-  constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
+  constructor(public pointerService: PointerService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
   ngOnInit() {
 
@@ -176,15 +176,15 @@ export class ChartAreaComponent implements OnInit {
 
     // initial instrument highlighting
     var frameNr = Math.round(xFrameScale.invert(xPos));  // calculate frame number
-    this.eventService.highlightInsturments(this.videoMetadata.name, frameNr);
+    this.pointerService.highlightInsturments(this.videoMetadata.name, frameNr);
 
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
       // add drag behavior for pointer element
-      pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
+      pointer.call(drag().on('drag', () => this.pointerService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
 
       // add click behavior for svg element
-      svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
+      svgElement.on('click', () => this.pointerService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
     });
   }
 

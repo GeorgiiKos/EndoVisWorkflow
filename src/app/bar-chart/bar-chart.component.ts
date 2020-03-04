@@ -1,6 +1,6 @@
 import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { drag, range, scaleBand, scaleLinear, scaleOrdinal, scaleTime, select } from 'd3';
-import { EventService } from '../services/event.service';
+import { PointerService } from '../services/pointer.service';
 import { PositioningService } from '../services/positioning.service';
 import { ScaleService } from '../services/scale.service';
 
@@ -14,7 +14,7 @@ export class BarChartComponent implements OnInit {
   @Input() videoMetadata;
   @Input() phaseAnnotation;
 
-  constructor(private eventService: EventService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
+  constructor(private pointerService: PointerService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
   ngOnInit() {
 
@@ -177,11 +177,11 @@ export class BarChartComponent implements OnInit {
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
       // add drag behavior for pointer element
-      pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
-      imageFrameArrow.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
+      pointer.call(drag().on('drag', () => this.pointerService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
+      imageFrameArrow.call(drag().on('drag', () => this.pointerService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
 
       // add click behavior for svg element
-      svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
+      svgElement.on('click', () => this.pointerService.movePointer(this.videoMetadata.name, group, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
     });
   }
 

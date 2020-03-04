@@ -161,10 +161,10 @@ export class ChartAreaComponent implements OnInit {
       .attr("stroke", "gray");
 
     // add drag behavior for pointer element
-    pointer.call(drag().on('drag', () => this.eventService.dragBehavior(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+    pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
 
     // add click behavior for svg element
-    svgElement.on('click', () => this.eventService.clickBehavior(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+    svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
   }
 
   // TODO: maybe it is possible to do it with d3?

@@ -10,18 +10,20 @@ import { DataService } from '../services/data.service';
 })
 export class SurgeryListItemComponent implements OnInit {
 
-  public cardExpanded = false;
-
   @Input() videoMetadata;
-  public duration;
   public phaseAnnotation;
   public deviceData;
   public instrumentAnnotation;
 
+  public duration;
+  public type;
+  public cardExpanded = false;
+
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
-    this.displayDuration();
+    this.convertDuration();
+    this.calculateType();
     this.dataService.getPhaseAnnotation(this.videoMetadata.name)
       .subscribe(response => {
         this.phaseAnnotation = csvParseRows(response, (data, index) => {
@@ -61,12 +63,22 @@ export class SurgeryListItemComponent implements OnInit {
     });
   }
 
-  private displayDuration() {
+  private convertDuration() {
     var dateObj = new Date(this.videoMetadata.duration);
     var hours = ('0' + dateObj.getUTCHours()).slice(-2);
     var minutes = ('0' + dateObj.getUTCMinutes()).slice(-2);
     var seconds = ('0' + dateObj.getUTCSeconds()).slice(-2)
     this.duration = `${hours}:${minutes}:${seconds}`;
+  }
+
+  private calculateType() {
+    if (this.videoMetadata.name.includes('Prokto')) {
+      this.type = 1;
+    } else if (this.videoMetadata.name.includes('Rektum')) {
+      this.type = 2;
+    } else if (this.videoMetadata.name.includes('Sigma')) {
+      this.type = 3
+    }
   }
 
   public expandCard() {

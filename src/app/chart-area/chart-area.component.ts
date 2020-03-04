@@ -80,7 +80,8 @@ export class ChartAreaComponent implements OnInit {
         .tickFormat(''))
       .call(g => g.select('.domain').remove())
       .call(g => g.select('line').remove())  // remove first line
-      .call(g => g.selectAll('line').style('stroke', '#ededed'));
+      .selectAll('line')
+      .style('stroke', '#ededed');
 
     // add y-axis
     group.append('g')
@@ -137,8 +138,9 @@ export class ChartAreaComponent implements OnInit {
         .tickFormat(''))
       .call(g => g.select('.domain').remove())
       .call(g => g.select('line').remove())  // remove first line
-      .call(g => g.selectAll('line').style('stroke', '#ededed'))
-      .attr('transform', `translate(0, ${yScale.bandwidth() / 2})`);
+      .attr('transform', `translate(0, ${yScale.bandwidth() / 2})`)
+      .selectAll('line')
+      .style('stroke', '#ededed');
 
     // add y-axis
     group.append('g')
@@ -158,13 +160,6 @@ export class ChartAreaComponent implements OnInit {
       .attr('width', (d) => xFrameScale(d.to - d.from))
       .attr('fill', (d) => this.scales.instrumentAnnotationColorScale(d.header))
       .attr('height', yScale.bandwidth());
-
-    // group.append('g')
-    //   .attr('class', 'grid')
-    //   .call(axisLeft(yScale).ticks(13)
-    //     .tickSize(-svgWidth)
-    //     .tickFormat('')
-    //   )
   }
 
   private drawPointer(globalGroup, svgElement, innerWidth, xFrameScale, xTimeScale) {
@@ -177,7 +172,7 @@ export class ChartAreaComponent implements OnInit {
       .attr("y2", this.positioning.chartAreaHeight)
       .attr("stroke-width", this.positioning.pointerWidth)
       .attr("stroke", "gray");
-    
+
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
       // add drag behavior for pointer element

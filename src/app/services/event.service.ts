@@ -47,7 +47,7 @@ export class EventService {
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`)
   }
 
-  private getImageUrl(name, frameNr, frameSamplingRate) {  // TODO: read from videoMetadata
+  private getImageUrl(name, frameNr, frameSamplingRate) {
     while (frameNr % frameSamplingRate != 0) { frameNr--; }
 
     var frameNrFormat = frameNr.toString().padStart(6, '0');

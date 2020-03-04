@@ -10,7 +10,7 @@ export class EventService {
 
   constructor(private pos: PositioningService, private scales: ScaleService) { }
 
-  public movePointer(name, group, width, frameSamplingRate, frameWidth, xFramesScale, xTimeScale) {
+  public movePointer(name, group, width, frameSamplingRate, frameWidth, phaseAnnotation, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
     var imageFrame = selectAll(`.image-frame-${name}`);
@@ -24,8 +24,9 @@ export class EventService {
     image.attr('src', this.getImageUrl(name, frameNr, frameSamplingRate));  // update image
     imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`);
     imageFrameArrow.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`);
-    var time = xTimeScale(frameNr);
-    imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`);
+    var time = xTimeScale(frameNr);  // calculate time
+    var phase = phaseAnnotation[frameNr] ? phaseAnnotation[frameNr].phase : 'x';  // calculate phase
+    imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)} | ${phase}`);
 
     this.highlightInsturments(name, frameNr);
   }
@@ -45,7 +46,7 @@ export class EventService {
 
     labels.filter((d) => !columns.includes(d)).style('font-weight', 'normal').style('fill', 'black');  // reset labels for rects that do not intersect with pointer
     labels.filter((d) => columns.includes(d)).style('font-weight', 'bold').style('fill', 'red');  // add effect for labels for rects that intersect with pointer
-    
+
     rects.filter((d) => d.from > frameNr || d.to < frameNr).attr('opacity', 1);  // reset rects that do not intersect with pointer
     rectsIntersect.attr('opacity', 0.7);  // add effect for rects that intersect with pointer
   }

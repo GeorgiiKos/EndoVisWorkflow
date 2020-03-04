@@ -15,6 +15,7 @@ export class ChartAreaComponent implements OnInit {
   @Input() videoMetadata;
   @Input() deviceData;
   @Input() instrumentAnnotation;
+  @Input() phaseAnnotation;
 
   constructor(public eventService: EventService, private positioning: PositioningService, private scales: ScaleService, private zone: NgZone) { }
 
@@ -180,10 +181,10 @@ export class ChartAreaComponent implements OnInit {
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
       // add drag behavior for pointer element
-      pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale)));
+      pointer.call(drag().on('drag', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
 
       // add click behavior for svg element
-      svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, xFrameScale, xTimeScale));
+      svgElement.on('click', () => this.eventService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
     });
   }
 

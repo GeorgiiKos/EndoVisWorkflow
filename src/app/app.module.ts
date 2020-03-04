@@ -6,9 +6,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { SurgeryListComponent } from './surgery-list/surgery-list.component';
 import { SurgeryListItemComponent } from './surgery-list-item/surgery-list-item.component';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
-import { TableComponent } from './table/table.component';
 import { ChartAreaComponent } from './chart-area/chart-area.component';
 import { ControlPanelComponent } from './control-panel/control-panel.component';
+import { AggregateDataComponent } from './aggregate-data/aggregate-data.component';
 
 
 @NgModule({
@@ -18,8 +18,8 @@ import { ControlPanelComponent } from './control-panel/control-panel.component';
     SurgeryListItemComponent,
     BarChartComponent,
     ChartAreaComponent,
-    TableComponent,
     ControlPanelComponent,
+    AggregateDataComponent,
   ],
   imports: [
     BrowserModule,

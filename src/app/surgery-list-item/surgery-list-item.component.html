@@ -40,7 +40,7 @@
         <div *ngIf="videoMetadata && deviceData && instrumentAnnotation && phaseAnnotation" [hidden]="!cardExpanded">
             <app-chart-area [videoMetadata]="videoMetadata" [deviceData]="deviceData"[instrumentAnnotation]="instrumentAnnotation" [phaseAnnotation]="phaseAnnotation"></app-chart-area>
             <app-control-panel [videoMetadata]="videoMetadata"></app-control-panel>
-            <app-table [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation"></app-table>
+            <app-aggregate-data [videoMetadata]="videoMetadata" [phaseAnnotation]="phaseAnnotation"></app-aggregate-data>
         </div>
     </div>
 </div>

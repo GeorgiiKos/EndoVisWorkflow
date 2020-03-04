@@ -2,16 +2,15 @@ import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { ascending, descending, nest, range, scan, select } from 'd3';
 
 @Component({
-  selector: 'app-table',
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.css']
+  selector: 'app-aggregate-data',
+  templateUrl: './aggregate-data.component.html',
+  styleUrls: ['./aggregate-data.component.css']
 })
-export class TableComponent implements OnInit {
+export class AggregateDataComponent implements OnInit {
 
   // videoMetadata object passed from parent component
   @Input() videoMetadata;
   @Input() phaseAnnotation;
-
 
   constructor(private zone: NgZone) { }
 
@@ -141,5 +140,6 @@ export class TableComponent implements OnInit {
     });
     return data;
   }
+
 
 }

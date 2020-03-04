@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, NgZone } from '@angular/core';
+import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { axisBottom, axisLeft, curveBasis, drag, line, scaleBand, scaleLinear, scaleTime, select } from 'd3';
 import { largestTriangleThreeBucket, modeMedian } from 'd3fc-sample';
 import { EventService } from '../services/event.service';
@@ -144,7 +144,7 @@ export class ChartAreaComponent implements OnInit {
 
     // add y-axis
     group.append('g')
-      .attr('class', 'y-axis')
+      .attr('class', 'y-axis y-axis-instrumentAnnotation')
       .call(axisLeft(yScale));
 
     // transform data into a better representation
@@ -163,7 +163,7 @@ export class ChartAreaComponent implements OnInit {
   }
 
   private drawPointer(globalGroup, svgElement, innerWidth, xFrameScale, xTimeScale) {
-    var xPos = select(`.pointer-${this.videoMetadata.name}`).attr('x1');
+    var xPos = parseFloat(select(`.pointer-${this.videoMetadata.name}`).attr('x1'));
     var pointer = globalGroup.append('line')
       .attr('class', `pointer-${this.videoMetadata.name}`)
       .attr("x1", xPos)
@@ -172,6 +172,10 @@ export class ChartAreaComponent implements OnInit {
       .attr("y2", this.positioning.chartAreaHeight)
       .attr("stroke-width", this.positioning.pointerWidth)
       .attr("stroke", "gray");
+
+    // initial instrument highlighting
+    var frameNr = Math.round(xFrameScale.invert(xPos));  // calculate frame number
+    this.eventService.highlightInsturments(this.videoMetadata.name, frameNr);
 
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {

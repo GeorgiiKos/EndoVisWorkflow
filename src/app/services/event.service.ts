@@ -27,16 +27,15 @@ export class EventService {
     var time = xTimeScale(frameNr);
     imageFrameInfo.text(`${frameNr} | ${('0' + time.getUTCHours()).slice(-2)}:${('0' + time.getUTCMinutes()).slice(-2)}:${('0' + time.getUTCSeconds()).slice(-2)}`);
 
-    this.highlightInsturments(name, frameNr)
+    this.highlightInsturments(name, frameNr);
   }
 
-  private highlightInsturments(name, frameNr) {
+  public highlightInsturments(name, frameNr) {
     var chartArea = select(`#chart-area-${name}`); // select chart area
     var rects = selectAll(`.instrument-${name}`);  // select rects
     var rectsIntersect = rects.filter((d) => d.from <= frameNr && d.to >= frameNr);  // select rects that intersect with pointer
 
-    var labels = chartArea.selectAll('.y-axis').selectAll('text').style('font-weight', 'normal').style('fill', 'black');  // select and resert labels
-    rects.filter((d) => d.from > frameNr || d.to < frameNr).attr('opacity', 1);  // reset all rects
+    var labels = chartArea.select('.y-axis-instrumentAnnotation').selectAll('text');  // select and resert labels
 
     // extract instrument names from class names
     var rectsIntersect = rects.filter((d) => d.from <= frameNr && d.to >= frameNr);
@@ -44,7 +43,10 @@ export class EventService {
     rectsIntersect.each(function (d) { columns.push(select(this).attr('class').split(' ')[1]) });
     columns = columns.map((e) => this.scales.instrumentAnnotationHeaderScale(e));
 
-    labels.filter((d) => columns.includes(d)).style('font-weight', 'bold').style('fill', 'red');  // find labels for rects that intersect with pointer
+    labels.filter((d) => !columns.includes(d)).style('font-weight', 'normal').style('fill', 'black');  // reset labels for rects that do not intersect with pointer
+    labels.filter((d) => columns.includes(d)).style('font-weight', 'bold').style('fill', 'red');  // add effect for labels for rects that intersect with pointer
+    
+    rects.filter((d) => d.from > frameNr || d.to < frameNr).attr('opacity', 1);  // reset rects that do not intersect with pointer
     rectsIntersect.attr('opacity', 0.7);  // add effect for rects that intersect with pointer
   }
 

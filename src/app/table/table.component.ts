@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { ascending, descending, nest, range, scan, select } from 'd3';
 
 @Component({
@@ -13,7 +13,7 @@ export class TableComponent implements OnInit {
   @Input() phaseAnnotation;
 
 
-  constructor() { }
+  constructor(private zone: NgZone) { }
 
   ngOnInit() {
   }
@@ -43,7 +43,10 @@ export class TableComponent implements OnInit {
       .text((column) => column)
       .attr('class', 'header')
       .attr('class', (d, i) => d === 'Phase' ? 'asc' : '')  // display arrow
-      .on('click', function (d) {  // sort table
+
+    // add event listeners outside angular change detection zone
+    this.zone.runOutsideAngular(() => {
+      thead.on('click', function (d) {  // sort table
         thead.attr('class', 'header')  // remove classes
         thead.classed('des', false);
         if (sortAscending) {
@@ -56,6 +59,7 @@ export class TableComponent implements OnInit {
           this.className = 'desc';
         }
       });
+    });
 
     // create a row for each object in the data
     var rows = tbody.selectAll('tr')

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { autoType, csvParse, csvParseRows } from 'd3';
 import { DataService } from '../services/data.service';
 
@@ -6,6 +6,7 @@ import { DataService } from '../services/data.service';
 @Component({
   selector: 'app-surgery-list-item',
   templateUrl: './surgery-list-item.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./surgery-list-item.component.css']
 })
 export class SurgeryListItemComponent implements OnInit {
@@ -19,7 +20,7 @@ export class SurgeryListItemComponent implements OnInit {
   public type;
   public cardExpanded = false;
 
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.convertDuration();
@@ -32,6 +33,7 @@ export class SurgeryListItemComponent implements OnInit {
             phase: parseInt(data[1])
           }
         });
+        this.cdr.detectChanges();
       });
   }
 
@@ -56,10 +58,12 @@ export class SurgeryListItemComponent implements OnInit {
           exposureIndex: parseInt(data[14])
         }
       });
+      this.cdr.detectChanges();
     });
 
     this.dataService.getInstrumentAnnotation(this.videoMetadata.name).subscribe(response => {
-      this.instrumentAnnotation = csvParse(response, autoType)
+      this.instrumentAnnotation = csvParse(response, autoType);
+      this.cdr.detectChanges();
     });
   }
 
@@ -69,6 +73,7 @@ export class SurgeryListItemComponent implements OnInit {
     var minutes = ('0' + dateObj.getUTCMinutes()).slice(-2);
     var seconds = ('0' + dateObj.getUTCSeconds()).slice(-2)
     this.duration = `${hours}:${minutes}:${seconds}`;
+    this.cdr.detectChanges();
   }
 
   private calculateType() {
@@ -79,6 +84,7 @@ export class SurgeryListItemComponent implements OnInit {
     } else if (this.videoMetadata.name.includes('Sigma')) {
       this.type = 3
     }
+    this.cdr.detectChanges();
   }
 
   public expandCard() {
@@ -90,6 +96,7 @@ export class SurgeryListItemComponent implements OnInit {
     } else {
       this.cardExpanded = false;
     }
+    this.cdr.detectChanges();
   }
 
 }

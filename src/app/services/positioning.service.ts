@@ -25,7 +25,7 @@ export class PositioningService {
 
   barChartImageFramePadding = 5;
   barChartImageFrameInfoHeight = 15;
-  barChartImageFrameInfoFontSize = 10;
+  barChartImageFrameInfoFontSize = 0.6;
   barChartImageFrameArrowHeight = 16;
 
   // chart area

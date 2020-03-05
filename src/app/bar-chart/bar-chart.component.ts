@@ -52,6 +52,7 @@ export class BarChartComponent implements OnInit {
       .attr('class', `tooltipBubble-${this.videoMetadata.name}`)
       .style('position', 'absolute')
       .style('left', '0px')
+      .style('height', `${this.pos.barChartTooltipBubbleHeight}px`)
       .style('top', `${this.pos.barChartMarginTop - this.pos.barChartTooltipBubbleHeight - this.pos.barChartTooltipArrowHeight}px`)
       .style('opacity', 0)
       .style('background-color', 'lightgray')
@@ -157,7 +158,7 @@ export class BarChartComponent implements OnInit {
 
     // add image frame info section
     var imageFrameInfo = imageFrame.append('div')
-      .style('font-size', `${this.pos.barChartImageFrameInfoFontSize}px`)
+      .style('font-size', `${this.pos.barChartImageFrameInfoFontSize}rem`)
       .style('text-align', 'center')
       .style('height', `${this.pos.barChartImageFrameInfoHeight}px`)
       .text(`0 | 00:00:00 | ${this.phaseAnnotation[0].phase}`)

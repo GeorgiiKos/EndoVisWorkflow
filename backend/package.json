@@ -1,6 +1,6 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
+  "name": "endo-vis-workflow-backend",
+  "version": "0.3.0",
   "description": "",
   "main": "server.js",
   "scripts": {

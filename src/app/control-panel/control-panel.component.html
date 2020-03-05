@@ -13,25 +13,29 @@
             <td>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'currentGasFlowRate-' + videoMetadata.name" checked>
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'currentGasFlowRate-' + videoMetadata.name" checked>
                         Current gas flow rate
                     </label>
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'targetGasFlowRate-' + videoMetadata.name">
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'targetGasFlowRate-' + videoMetadata.name">
                         Target gas flow rate
                     </label>
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'currentGasPressure-' + videoMetadata.name">
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'currentGasPressure-' + videoMetadata.name">
                         Current gas pressure
                     </label>
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'targetGasPressure-' + videoMetadata.name">
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'targetGasPressure-' + videoMetadata.name">
                         Target gas pressure
                     </label>
                 </div>
@@ -43,7 +47,8 @@
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'gasSupplyPressure-' + videoMetadata.name">
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'gasSupplyPressure-' + videoMetadata.name">
                         Gas supply pressure
                     </label>
                 </div>
@@ -63,13 +68,15 @@
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'intensityLight1-' + videoMetadata.name">
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'intensityLight1-' + videoMetadata.name">
                         Intensity light 1
                     </label>
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" [value]="'intensityLight2-' + videoMetadata.name">
+                        <input class="form-check-input" type="checkbox"
+                            [value]="'intensityLight2-' + videoMetadata.name">
                         Intensity light 2
                     </label>
                 </div>
@@ -104,9 +111,8 @@
             </td>
             <td>
                 <div class="form-group">
-                    <label for="lineWidth">Line width</label>
-                    <input type="range" min="1" max="3" step="0.2" value="1" class="form-control-range"
-                        [id]="'lineWidth-' + videoMetadata.name">
+                    <label>Line width</label>
+                    <input type="range" min="1" max="3" step="0.2" value="1" class="form-control-range" [id]="'lineWidth-' + videoMetadata.name">
                 </div>
             </td>
         </tr>

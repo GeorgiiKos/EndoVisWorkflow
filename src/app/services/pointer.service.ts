@@ -52,6 +52,7 @@ export class PointerService {
   }
 
   private getImageUrl(name, frameNr, frameSamplingRate, numFrames) {
+    // find nearest frame
     if (frameNr % frameSamplingRate > frameSamplingRate / 2 && frameNr + (frameSamplingRate - frameNr % frameSamplingRate) <= numFrames) {
       frameNr += frameSamplingRate - frameNr % frameSamplingRate;
     } else {

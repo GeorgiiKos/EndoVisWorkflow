@@ -10,7 +10,7 @@ export class PointerService {
 
   constructor(private pos: PositioningService, private scales: ScaleService) { }
 
-  public movePointer(name, group, width, frameSamplingRate, frameWidth, phaseAnnotation, xFramesScale, xTimeScale) {
+  public movePointer(name, group, width, frameSamplingRate, numFrames, frameWidth, phaseAnnotation, xFramesScale, xTimeScale) {
     var pointers = selectAll(`.pointer-${name}`);
     var image = selectAll(`.image-${name}`);
     var imageFrame = selectAll(`.image-frame-${name}`);
@@ -21,7 +21,7 @@ export class PointerService {
     var xUpdated = xMouse < 0 ? 0 : xMouse > width ? width : xMouse;  // check if x doesnt exceed group 
     pointers.attr('x1', xUpdated).attr('x2', xUpdated);  // update pointer position
     var frameNr = Math.round(xFramesScale.invert(xUpdated));  // calculate frame number
-    image.attr('src', this.getImageUrl(name, frameNr, frameSamplingRate));  // update image
+    image.attr('src', this.getImageUrl(name, frameNr, frameSamplingRate, numFrames));  // update image
     imageFrame.style('left', `${xUpdated - (frameWidth / 2 + this.pos.barChartImageFramePadding)}px`);
     imageFrameArrow.attr('points', `${xUpdated - this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated + this.pos.barChartImageFrameArrowHeight / 2},${this.pos.barChartMarginTop} ${xUpdated},${this.pos.barChartMarginTop + this.pos.barChartImageFrameArrowHeight}`);
     var time = xTimeScale(frameNr);  // calculate time
@@ -51,8 +51,12 @@ export class PointerService {
     rectsIntersect.attr('opacity', 0.7);  // add effect for rects that intersect with pointer
   }
 
-  private getImageUrl(name, frameNr, frameSamplingRate) {
-    while (frameNr % frameSamplingRate != 0) { frameNr--; }
+  private getImageUrl(name, frameNr, frameSamplingRate, numFrames) {
+    if (frameNr % frameSamplingRate > frameSamplingRate / 2 && frameNr + (frameSamplingRate - frameNr % frameSamplingRate) <= numFrames) {
+      frameNr += frameSamplingRate - frameNr % frameSamplingRate;
+    } else {
+      frameNr -= frameNr % frameSamplingRate;
+    }
 
     var frameNrFormat = frameNr.toString().padStart(6, '0');
     return `/data/Frames/${name}/Frame${frameNrFormat}.jpg`;

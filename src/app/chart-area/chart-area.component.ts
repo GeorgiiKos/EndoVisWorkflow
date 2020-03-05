@@ -182,10 +182,10 @@ export class ChartAreaComponent implements OnInit {
     // add event listeners outside angular change detection zone
     this.zone.runOutsideAngular(() => {
       // add drag behavior for pointer element
-      pointer.call(drag().on('drag', () => this.pointerService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
+      pointer.call(drag().on('drag', () => this.pointerService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.numFrames, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale)));
 
       // add click behavior for svg element
-      svgElement.on('click', () => this.pointerService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
+      svgElement.on('click', () => this.pointerService.movePointer(this.videoMetadata.name, globalGroup, innerWidth, this.videoMetadata.frameSamplingRate, this.videoMetadata.numFrames, this.videoMetadata.frameWidth, this.phaseAnnotation, xFrameScale, xTimeScale));
     });
   }
 

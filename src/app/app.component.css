@@ -1,4 +1,4 @@
-:host .dropdown-item.desc:after {
+.dropdown-item.desc:after {
     display: inline-block;
     margin-left: .255em;
     vertical-align: .255em;
@@ -9,7 +9,7 @@
     border-left: .3em solid transparent;
 }
   
-:host .dropdown-item.asc:after {
+.dropdown-item.asc:after {
     display: inline-block;
     margin-left: .255em;
     vertical-align: .255em;

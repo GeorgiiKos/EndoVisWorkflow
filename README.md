@@ -2,10 +2,10 @@
 
 ## Required frameworks
 
-- Node.js 10.16.0 - https://nodejs.org/download/release/v10.16.0/
-- Angular CLI 8.3.25 - `npm install -g @angular/cli@8.3.25`
-- Python 3
-- OpenCV
+- **Node.js 10.16.0** https://nodejs.org/download/release/v10.16.0/
+- **Angular CLI 8.3.25** `npm install -g @angular/cli@8.3.25`
+- **Python 3**
+- **OpenCV**
 
 ## Setting up the project
 
@@ -36,4 +36,4 @@
 1. Run command `npm run build`
 2. Navigate to the backend folder `cd backend`
 3. Start the node server with `npm start`
-4. Navigate to `http://localhost:8000/`
+4. Navigate to http://localhost:8000/

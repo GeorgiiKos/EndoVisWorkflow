@@ -45,9 +45,5 @@ export class SurgeryListComponent implements OnInit {
       }
     }
   }
-  public changeDetect() {
-    // console.log('change detected in surgery list')
-    return 'abc'
-  }
 
 }
